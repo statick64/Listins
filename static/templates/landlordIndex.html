@@ -25,11 +25,6 @@
                         <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
                     </div>
                 </div>
-                <!-- <div class="flex items-center">
-                    <a href="{% url 'housing:login' %}"><button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium mr-3"> Sign In</button></a>
-                    <a href="{% url 'housing:register' %}"><button class="!rounded-button border border-custom text-custom px-4 py-2 text-sm font-medium">Register</button></a>
-                </div> -->
-
                 {% if user.is_authenticated %}
                     <div class="flex items-center"><div class="relative"><button class="flex items-center !rounded-button bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200" onclick="document.getElementById(&#34;user-dropdown&#34;).classList.toggle(&#34;hidden&#34;)"><img src="{% static 'images/placeholder.jpg' %}" class="h-6 w-6 rounded-full mr-2" /><span>{{ user.first_name }} </span><i class="fas fa-chevron-down ml-2"></i></button><div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a><div class="border-t border-gray-100"></div><a href="{% url 'housing:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a></div></div></div>
                 {% else %}
@@ -45,59 +40,22 @@
         <section class="relative bg-white">
             <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div class="text-center max-w-3xl mx-auto">
-                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">Your Student Housing Expert</h1>
-                    <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg">No commission, no hidden fees - just quality student accommodations</p>
+                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">Landlord Portal - Manage Your Properties</h1>
+                    <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg">Efficiently manage your student housing properties and connect with potential tenants</p>
                 </div>
-                <div class="mt-10 max-w-4xl mx-auto">
-                    <div class="bg-white shadow-lg !rounded-button p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="relative">
-                                <label class="block text-sm font-medium text-gray-700">Location</label>
-                                <div class="mt-1 relative">
-                                    <input type="text" class="!rounded-button block w-full border-gray-300 pl-10" placeholder="Enter city or university"/>
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-map-marker-alt text-gray-400"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Property Type</label>
-                                <select class="!rounded-button mt-1 block w-full border-gray-300">
-                                    <option>All Types</option>
-                                    <option>Studio</option>
-                                    <option>Apartment</option>
-                                    <option>House Share</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Price Range</label>
-                                <select class="!rounded-button mt-1 block w-full border-gray-300">
-                                    <option>Any Price</option>
-                                    <option>$0 - $500</option>
-                                    <option>$500 - $1000</option>
-                                    <option>$1000+</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <button class="!rounded-button w-full bg-custom text-white px-4 py-2 text-sm font-medium">
-                                Search Properties
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <div class="mt-10 max-w-4xl mx-auto"><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="bg-white shadow-lg !rounded-button p-6 text-center"><i class="fas fa-plus-circle text-4xl text-custom mb-4"></i><h3 class="text-xl font-semibold mb-2">List New Property</h3><p class="text-gray-500 mb-4">Add a new property listing to your portfolio</p><a href="{% url 'housing:add_property' %}" class="!rounded-button bg-custom text-white px-6 py-2 text-sm font-medium w-full">Add Property</a></div><div class="bg-white shadow-lg !rounded-button p-6"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-semibold">Active Listings</h3><span class="text-3xl font-bold text-custom">12</span></div><div class="space-y-2"><div class="flex justify-between text-sm"><span class="text-gray-500">Total Views</span><span class="font-medium">1,234</span></div><div class="flex justify-between text-sm"><span class="text-gray-500">Inquiries</span><span class="font-medium">56</span></div></div></div><div class="bg-white shadow-lg !rounded-button p-6"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-semibold">Revenue Overview</h3></div><div class="space-y-2"><div class="flex justify-between text-sm"><span class="text-gray-500">This Month</span><span class="font-medium">$15,400</span></div><div class="flex justify-between text-sm"><span class="text-gray-500">Last Month</span><span class="font-medium">$12,800</span></div></div></div></div></div>
+            </div> 
         </section>
         <section class="bg-gray-50 py-12">
             <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900">Most Popular Properties</h2>
+                    <h2 class="text-2xl font-bold text-gray-900">Your Listed Properties</h2>
                     <a href="#" class="text-custom font-medium hover:text-custom-dark">View all</a>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="bg-white shadow !rounded-button overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A modern student apartment interior with clean minimalist design, featuring a well-lit study area and comfortable living space. Natural light streams through large windows, highlighting contemporary furniture and neutral color scheme. The room has a neat, organized layout perfect for academic life.&width=600&height=400&orientation=landscape&flag=ae7882a2-8593-4e30-81bc-382ef2e85ebd&flag=87ecf333-a271-4f3b-b4f8-f94138a2557d" class="h-48 w-full object-cover" alt="Property"/>
+                        <img src="https://creatie.ai/ai/api/search-image?query=A modern student apartment interior with clean minimalist design, featuring a well-lit study area and comfortable living space. Natural light streams through large windows, highlighting contemporary furniture and neutral color scheme. The room has a neat, organized layout perfect for academic life.&width=600&height=400&orientation=landscape&flag=ae7882a2-8593-4e30-81bc-382ef2e85ebd&flag=87ecf333-a271-4f3b-b4f8-f94138a2557d&flag=2aeeea4e-0017-4cfd-a1ce-fca52651d417&flag=adddd169-1c8d-4069-9b26-054c5efd1214&flag=7f214158-a162-4fac-a79e-da7c10645598&flag=a3af7947-07f9-41d9-9b0d-9f50801d918c&flag=cf4498f9-2cec-436b-8607-2d2851f1fcc4&flag=dd31b44e-a836-47cf-b9ed-205920ca28c3&flag=c7836fe0-9ad4-4236-9624-59fbf2f6e988&flag=b7ec3c49-6198-489d-9274-044cbe892605" class="h-48 w-full object-cover" alt="Property"/>
                         <div class="p-6">
                             <div class="flex justify-between items-start">
                                 <div>
@@ -121,7 +79,7 @@
                         </div>
                     </div>
                     <div class="bg-white shadow !rounded-button overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A spacious shared student house interior with modern amenities, showing a bright common area with comfortable seating and study spaces. The room features contemporary decor, wooden floors, and large windows providing natural illumination.&width=600&height=400&orientation=landscape&flag=b1de18a7-4c6f-40e6-b3cc-88177a298182&flag=79bfd7a4-d644-4492-8c07-cfe32fe7459f" class="h-48 w-full object-cover" alt="Property"/>
+                        <img src="https://creatie.ai/ai/api/search-image?query=A spacious shared student house interior with modern amenities, showing a bright common area with comfortable seating and study spaces. The room features contemporary decor, wooden floors, and large windows providing natural illumination.&width=600&height=400&orientation=landscape&flag=b1de18a7-4c6f-40e6-b3cc-88177a298182&flag=79bfd7a4-d644-4492-8c07-cfe32fe7459f&flag=fdfcd34b-7297-4c49-83ca-4369e469a956&flag=8b386e01-16f4-4b23-bff5-4a80d1b678d7&flag=b6687b64-a46e-4293-aa8e-195a2f5b206f&flag=2acab5f2-f6ac-4927-b622-a323b0cd1aba&flag=2ca7fb6c-8aff-4e9a-affe-14765cc40144&flag=43babce8-dd7f-4864-9b58-92eebafe0e15&flag=0e148e2a-4e28-4c7b-aef5-3fb2cc87ce80&flag=06b76b85-8cd5-4d31-9b11-0a35133e5444" class="h-48 w-full object-cover" alt="Property"/>
                         <div class="p-6">
                             <div class="flex justify-between items-start">
                                 <div>
@@ -145,7 +103,7 @@
                         </div>
                     </div>
                     <div class="bg-white shadow !rounded-button overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A luxury student apartment interior with high-end finishes, featuring a modern kitchen and living area. The space showcases premium appliances, stylish furniture, and contemporary design elements with abundant natural light from floor-to-ceiling windows.&width=600&height=400&orientation=landscape&flag=61cd7a80-5dee-456e-b7ca-0b28c986ef16&flag=bdf94962-d02d-4db7-8f6c-fc2e1992cf8c" class="h-48 w-full object-cover" alt="Property"/>
+                        <img src="https://creatie.ai/ai/api/search-image?query=A luxury student apartment interior with high-end finishes, featuring a modern kitchen and living area. The space showcases premium appliances, stylish furniture, and contemporary design elements with abundant natural light from floor-to-ceiling windows.&width=600&height=400&orientation=landscape&flag=61cd7a80-5dee-456e-b7ca-0b28c986ef16&flag=bdf94962-d02d-4db7-8f6c-fc2e1992cf8c&flag=68e38efb-fce4-4004-be32-25c10beff7c9&flag=a2e856e6-ced3-4497-9628-4457067d085c&flag=d036dd2d-c27b-427e-9efd-5006de2ace89&flag=9495a8de-049f-4f02-a2a5-4e06589cba6a&flag=fef57000-3b84-4dc4-bace-bef4676eefc9&flag=3723e39c-cf1c-4287-ac38-a262148f74b3&flag=69d4afa1-20f9-4375-b566-50861f3e4e9f&flag=db41be6e-e79e-4156-9c4b-f7fc52183402" class="h-48 w-full object-cover" alt="Property"/>
                         <div class="p-6">
                             <div class="flex justify-between items-start">
                                 <div>
@@ -168,36 +126,36 @@
                             </div>
                         </div>
                     </div>
-                <div class="bg-white shadow !rounded-button overflow-hidden"><img src="https://creatie.ai/ai/api/search-image?query=A cozy student apartment with modern furnishings, featuring a compact study area and comfortable living space, bright and well-organized.&width=600&height=400&orientation=landscape&flag=1746d449-a167-4331-b346-a2563151685f" class="h-48 w-full object-cover" alt="Property"/><div class="p-6"><div class="flex justify-between items-start"><div><h3 class="text-lg font-semibold text-gray-900">Cozy Student Apartment</h3><p class="text-sm text-gray-500">West Campus Area</p></div><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 !rounded-button">Available</span></div><div class="mt-4 flex items-center text-sm text-gray-500"><i class="fas fa-bed mr-2"></i><span class="mr-4">1 Bed</span><i class="fas fa-bath mr-2"></i><span class="mr-4">1 Bath</span><i class="fas fa-ruler-combined mr-2"></i><span>350 sq ft</span></div><div class="mt-4 flex justify-between items-center"><span class="text-2xl font-bold text-custom">$600/mo</span><button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium">View Details</button></div></div></div></div>
+                <div class="bg-white shadow !rounded-button overflow-hidden"><img src="https://creatie.ai/ai/api/search-image?query=A cozy student apartment with modern furnishings, featuring a compact study area and comfortable living space, bright and well-organized.&width=600&height=400&orientation=landscape&flag=1746d449-a167-4331-b346-a2563151685f&flag=afbac2c6-ce4e-4b8b-b49f-1b204be3deb8&flag=d730247d-33b6-41c1-a756-47b2c3bbcbcf&flag=fbf60ab0-481e-4e4e-8713-66dbc84a6f61&flag=de402167-a3cd-4995-945c-21fb9171e149&flag=689ff525-307b-47ee-a4cc-618ca655e331&flag=be14caa1-3274-45bf-a708-3bcdac27b05a&flag=aeadc08e-4a05-4d31-8591-0516fcd39f9e&flag=8bba3fef-262a-47f2-9fc4-e0cfd8d4e4e1" class="h-48 w-full object-cover" alt="Property"/><div class="p-6"><div class="flex justify-between items-start"><div><h3 class="text-lg font-semibold text-gray-900">Cozy Student Apartment</h3><p class="text-sm text-gray-500">West Campus Area</p></div><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 !rounded-button">Available</span></div><div class="mt-4 flex items-center text-sm text-gray-500"><i class="fas fa-bed mr-2"></i><span class="mr-4">1 Bed</span><i class="fas fa-bath mr-2"></i><span class="mr-4">1 Bath</span><i class="fas fa-ruler-combined mr-2"></i><span>350 sq ft</span></div><div class="mt-4 flex justify-between items-center"><span class="text-2xl font-bold text-custom">$600/mo</span><button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium">View Details</button></div></div></div></div>
             </div>
         </section>
         <section class="bg-white py-12">
             <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900">Why Choose Us</h2>
-                    <p class="mt-4 text-lg text-gray-500">We make finding your student accommodation simple and secure</p>
+                    <h2 class="text-3xl font-bold text-gray-900">Landlord Benefits</h2>
+                    <p class="mt-4 text-lg text-gray-500">Maximize your rental income with our comprehensive landlord services</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="text-center">
                         <div class="mx-auto flex items-center justify-center h-12 w-12 !rounded-button bg-custom bg-opacity-10 text-custom">
                             <i class="fas fa-shield-alt text-xl"></i>
                         </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Verified Properties</h3>
-                        <p class="mt-2 text-base text-gray-500">All properties are verified and meet our quality standards</p>
+                        <h3 class="mt-6 text-lg font-medium text-gray-900">Property Management Tools</h3>
+                        <p class="mt-2 text-base text-gray-500">Easy-to-use dashboard to manage listings, tenants, and payments</p>
                     </div>
                     <div class="text-center">
                         <div class="mx-auto flex items-center justify-center h-12 w-12 !rounded-button bg-custom bg-opacity-10 text-custom">
                             <i class="fas fa-comments text-xl"></i>
                         </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Direct Communication</h3>
-                        <p class="mt-2 text-base text-gray-500">Chat directly with landlords and get quick responses</p>
+                        <h3 class="mt-6 text-lg font-medium text-gray-900">Tenant Screening</h3>
+                        <p class="mt-2 text-base text-gray-500">Access to verified student profiles and screening reports</p>
                     </div>
                     <div class="text-center">
                         <div class="mx-auto flex items-center justify-center h-12 w-12 !rounded-button bg-custom bg-opacity-10 text-custom">
                             <i class="fas fa-credit-card text-xl"></i>
                         </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Secure Payments</h3>
-                        <p class="mt-2 text-base text-gray-500">Safe and secure payment processing for all transactions</p>
+                        <h3 class="mt-6 text-lg font-medium text-gray-900">Guaranteed Rent</h3>
+                        <p class="mt-2 text-base text-gray-500">Get paid on time with our secure payment system</p>
                     </div>
                 </div>
             </div>

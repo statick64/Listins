@@ -1,12 +1,38 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login, logout
-from .forms import CustomAuthenticationForm, SignUpForm
-from .models import CustomUser
+from .forms import CustomAuthenticationForm, SignUpForm, AccommodationForm
+from .models import CustomUser, Accommodation
 
 # Home Page
 def home(request):
     return render(request, "index.html")
+
+def landlord_home(request):
+    return render(request, "landlordIndex.html")
+
+# def add_property(request):
+#     return render(request, "addProperty.html")
+
+
+
+@login_required
+@csrf_protect
+def add_property(request):
+    if request.method == 'POST':
+        form = AccommodationForm(request.POST, request.FILES)
+        if form.is_valid():
+            accommodation = form.save(commit=False)
+            accommodation.landlord = request.user
+            accommodation.save()
+            return redirect('housing:landlord_home')  # Or redirect to another page
+    else:
+        form = AccommodationForm()
+    return render(request, 'addProperty.html', {'form': form})
+
+@login_required
+
 
 
 @csrf_protect
@@ -25,7 +51,10 @@ def user_login(request):  # Renamed to avoid conflict
         if user is not None:
             auth_login(request, user)  # Use Django’s built-in login function
             print("Login successful")
-            return redirect('housing:index')  
+            if user.user_type == 'Landlord':
+                return redirect('housing:landlord_home')  # Replace with actual name
+            elif user.user_type == 'Student':
+                return redirect('housing:index')  # Replace with actual name 
         else:
             print("Invalid credentials")
     else:

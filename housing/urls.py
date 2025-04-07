@@ -7,6 +7,8 @@ app_name = 'housing'
 
 urlpatterns = [
     path('', views.home, name='index'),
+    path('landlord_home', views.landlord_home, name='landlord_home'),
+    path('add_property', views.add_property, name='add_property'),
     path('register', views.register, name='register'),
     path('login', views.user_login, name='login'),
     path('logout', views.logout_view , name='logout'),

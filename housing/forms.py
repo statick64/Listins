@@ -2,7 +2,19 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 
+from .models import Accommodation
+
 User = get_user_model()  # This ensures you're using the correct user model
+
+
+PROPERTY_TYPE_CHOICES = [
+    ('Apartment', 'Apartment'),
+    ('Hostel', 'Hostel'),
+    ('Single Room', 'Single Room'),
+    ('Shared Room', 'Shared Room'),
+]
+
+STATUS_CHOICES = [('Available', 'Available'), ('Booked', 'Booked'), ('Coming Soon', 'Coming Soon')]
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(max_length=100, widget=forms.EmailInput(attrs={
@@ -100,3 +112,96 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User  # Make sure you're using the correct user model
         fields = [ 'first_name', 'last_name', 'username', 'phone_number', 'password1', 'password2', 'user_type']
+
+
+
+
+
+
+class AccommodationForm(forms.ModelForm):
+    property_type = forms.ChoiceField(choices= PROPERTY_TYPE_CHOICES, widget=forms.Select(attrs={
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    price = forms.DecimalField(widget=forms.NumberInput(attrs={
+        'placeholder': 'Enter price',
+        'class': 'block w-full pl-7 border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    title = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder': 'Enter Title',
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+    
+    address = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder': 'Enter address',
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    city = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder': 'Enter city',
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    state = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder': 'Enter state',
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    bedrooms = forms.IntegerField(widget=forms.NumberInput(attrs={
+        'placeholder': 'Number of bedrooms',
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    bathrooms = forms.IntegerField(widget=forms.NumberInput(attrs={
+        'placeholder': 'Number of bathrooms',
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    square_footage = forms.IntegerField(widget=forms.NumberInput(attrs={
+        'placeholder': 'Square footage',
+        'class': 'mt-1 block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'required': '',
+    }))
+
+    description = forms.CharField(widget=forms.Textarea(attrs={
+        'placeholder': 'Describe the accommodation',
+        'class': 'block w-full border-gray-300 focus:border-custom focus:ring-custom',
+        'rows': 4,
+        'required': '',
+    }))
+
+    
+    status = forms.ChoiceField(choices=STATUS_CHOICES, widget=forms.Select(attrs={
+        'class': 'block w-full pl-11 !rounded-button border-gray-300 focus:ring-custom focus:border-custom',
+        'required': '',
+    }))
+
+    building_images = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={
+        'class': 'block w-full border-gray-300 focus:ring-custom focus:border-custom file:rounded-button',
+    }))
+
+    class Meta:
+        model = Accommodation
+        exclude = ['landlord', 'accommodation_id', 'created_at']
+        fields = [
+            'property_type', 'price', 'address', 'city', 'state',
+            'bedrooms', 'bathrooms', 'square_footage',
+            'description', 'status', 'building_images','title'
+        ]
+    
+    
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Email already registered.")
+        return email
