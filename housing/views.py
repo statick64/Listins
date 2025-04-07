@@ -9,11 +9,16 @@ from .models import CustomUser, Accommodation
 def home(request):
     return render(request, "index.html")
 
+@login_required
 def landlord_home(request):
-    return render(request, "landlordIndex.html")
+    if request.user.user_type != 'Landlord':
+        # Handle cases where non-landlords access this view
+        return render(request, 'error_page.html', {'message': 'You are not authorized to view this page.'})
 
-# def add_property(request):
-#     return render(request, "addProperty.html")
+    accommodations = Accommodation.objects.filter(landlord=request.user)
+    return render(request, "landlordIndex.html", {'accommodations': accommodations})
+
+
 
 
 
@@ -31,7 +36,7 @@ def add_property(request):
         form = AccommodationForm()
     return render(request, 'addProperty.html', {'form': form})
 
-@login_required
+
 
 
 
