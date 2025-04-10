@@ -8,6 +8,7 @@ from .models import *
 
 admin.site.register(CustomUser)
 admin.site.register(Accommodation)
+admin.site.register(AccommodationImage)
 admin.site.register(Booking)
 admin.site.register(Notification)
 admin.site.register(ReviewDetails)

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 
-from .models import Accommodation
+from .models import Accommodation, AccommodationImage
 
 User = get_user_model()  # This ensures you're using the correct user model
 
@@ -185,9 +185,7 @@ class AccommodationForm(forms.ModelForm):
         'required': '',
     }))
 
-    building_images = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={
-        'class': 'block w-full border-gray-300 focus:ring-custom focus:border-custom file:rounded-button',
-    }))
+
 
     class Meta:
         model = Accommodation
@@ -195,7 +193,7 @@ class AccommodationForm(forms.ModelForm):
         fields = [
             'property_type', 'price', 'address', 'city', 'state',
             'bedrooms', 'bathrooms', 'square_footage',
-            'description', 'status', 'building_images','title'
+            'description', 'status', 'title'
         ]
     
     
@@ -205,3 +203,23 @@ class AccommodationForm(forms.ModelForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already registered.")
         return email
+    
+    
+class AccommodationImageForm(forms.ModelForm):
+    image = forms.ImageField(widget=forms.FileInput(attrs={
+        'class': 'hidden file-input',
+        'accept': 'image/*'
+    }))
+    
+
+
+    class Meta:
+        model = AccommodationImage
+        fields = ['image']
+
+AccommodationImageFormSet = forms.modelformset_factory(
+    AccommodationImage,
+    form=AccommodationImageForm,
+    extra=5,  # Number of empty forms to display
+    can_delete=True
+)
