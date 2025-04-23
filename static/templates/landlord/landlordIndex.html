@@ -3,14 +3,35 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Student Housing Platform</title>
+    <title>Listins Housing Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
     <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000" data-border-radius="small"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#6366f1'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+        font-family: 'Inter', sans-serif;
+        }
+        .property-card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        }
+
+
+
+    </style>
+
 </head>
+
 <body class="bg-gray-50 font-sans">
+    
     <nav class="bg-white shadow-sm fixed w-full z-50">
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -59,89 +80,52 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {% for accommodation in accommodations %}
-                        <div class="bg-white shadow !rounded-button overflow-hidden">
-                            {% if accommodation.first_image %}
-                                <img src= "{{ accommodation.first_image.image.url }}" class="h-48 w-full object-cover" alt="{{ accommodation.first_image.image.name }}"/>
+                        <div class="bg-white rounded-lg overflow-hidden shadow-md property-card transition-all duration-300">
+                            <div class="relative h-48">
+                            <img src="{{ accommodation.main_image.url }}" alt="Modern Studio Apartment" class="w-full h-full object-cover object-top">
+                            </div>
+                            <div class="p-4">
+                            <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-lg font-semibold text-gray-900">{{ accommodation.title }}</h3>
+                            {% if accommodation.status == 'Available' %}
+                                <div class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Available</div>
+                            {% elif accommodation.status == 'Coming Soon' %}
+                                <div class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">Coming Soon</div>
                             {% else %}
-                                <img src= "{% static 'images/house-placeholder.jpg' %}" class="h-48 w-full object-cover" alt="Property"/>  
+                                <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">Booked</div>
                             {% endif %}
-                            <div class="p-6">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900">{{ accommodation.title }}</h3>
-                                        <p class="text-sm text-gray-500">{{ accommodation.address }} {{ accommodation.state }} {{ accommodation.city }}</p>
-                                    </div>
-                                    {% if accommodation.status == 'Available' %}
-                                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 !rounded-button">Available</span>
-                                    {% elif accommodation.status == 'Coming Soon' %}
-                                        <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 !rounded-button">Coming Soon</span>
-                                    {% else %}
-                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 !rounded-button">Booked</span>
-                                    {% endif %}
-                                </div>
-                                <div class="mt-4 flex items-center text-sm text-gray-500">
-                                    <i class="fas fa-bed mr-2"></i>
-                                    <span class="mr-4">{{ accommodation.bedrooms }} Bed</span>
-                                    <i class="fas fa-bath mr-2"></i>
-                                    <span class="mr-4">{{ accommodation.bathrooms }} Bath</span>
-                                    <i class="fas fa-ruler-combined mr-2"></i>
-                                    <span>{{ accommodation.square_footage }} sq ft</span>
-                                </div>
-                                <div class="mt-4 flex justify-between items-center">
-                                    <span class="text-2xl font-bold text-custom">P{{ accommodation.price }}/mo</span>
-                                    <button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium">View Details</button>
-                                </div>
                             </div>
-                        </div>
+                            <p class="text-sm text-gray-600 mb-3">{{ accommodation.address }} {{ accommodation.state }} {{ accommodation.city }}</p>
+                            <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center text-gray-500 mr-1">
+                            <i class="ri-hotel-bed-line"></i>
+                            </div>
+                            <span class="text-sm text-gray-700">{{ accommodation.bedrooms }} Bed</span>
+                            </div>
+                            <div class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center text-gray-500 mr-1">
+                            <i class="ri-shower-line"></i>
+                            </div>
+                            <span class="text-sm text-gray-700">{{ accommodation.bathrooms }} Bath</span>
+                            </div>
+                            <div class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center text-gray-500 mr-1">
+                            <i class="ri-ruler-line"></i>
+                            </div>
+                            <span class="text-sm text-gray-700">{{ accommodation.square_footage }} sq ft</span>
+                            </div>
+                            </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                            <p class="text-lg font-bold text-gray-900">P{{ accommodation.price }}/mo</p>
+                            <a  href="{% url 'housing:view_property'  accommodation.accommodation_id %}" class="px-3 py-1.5 bg-black text-white text-sm font-medium !rounded-button whitespace-nowrap">View Details</a>
+                            </div>
+                            </div>
+                            </div>
                     {% endfor %}
-                    <!-- <div class="bg-white shadow !rounded-button overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A spacious shared student house interior with modern amenities, showing a bright common area with comfortable seating and study spaces. The room features contemporary decor, wooden floors, and large windows providing natural illumination.&width=600&height=400&orientation=landscape&flag=b1de18a7-4c6f-40e6-b3cc-88177a298182&flag=79bfd7a4-d644-4492-8c07-cfe32fe7459f&flag=fdfcd34b-7297-4c49-83ca-4369e469a956&flag=8b386e01-16f4-4b23-bff5-4a80d1b678d7&flag=b6687b64-a46e-4293-aa8e-195a2f5b206f&flag=2acab5f2-f6ac-4927-b622-a323b0cd1aba&flag=2ca7fb6c-8aff-4e9a-affe-14765cc40144&flag=43babce8-dd7f-4864-9b58-92eebafe0e15&flag=0e148e2a-4e28-4c7b-aef5-3fb2cc87ce80&flag=06b76b85-8cd5-4d31-9b11-0a35133e5444" class="h-48 w-full object-cover" alt="Property"/>
-                        <div class="p-6">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">Shared Student House</h3>
-                                    <p class="text-sm text-gray-500">5 min from Campus</p>
-                                </div>
-                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 !rounded-button">Available</span>
-                            </div>
-                            <div class="mt-4 flex items-center text-sm text-gray-500">
-                                <i class="fas fa-bed mr-2"></i>
-                                <span class="mr-4">4 Beds</span>
-                                <i class="fas fa-bath mr-2"></i>
-                                <span class="mr-4">2 Baths</span>
-                                <i class="fas fa-ruler-combined mr-2"></i>
-                                <span>1200 sq ft</span>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-custom">$500/mo</span>
-                                <button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium">View Details</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white shadow !rounded-button overflow-hidden">
-                        <img src="https://creatie.ai/ai/api/search-image?query=A luxury student apartment interior with high-end finishes, featuring a modern kitchen and living area. The space showcases premium appliances, stylish furniture, and contemporary design elements with abundant natural light from floor-to-ceiling windows.&width=600&height=400&orientation=landscape&flag=61cd7a80-5dee-456e-b7ca-0b28c986ef16&flag=bdf94962-d02d-4db7-8f6c-fc2e1992cf8c&flag=68e38efb-fce4-4004-be32-25c10beff7c9&flag=a2e856e6-ced3-4497-9628-4457067d085c&flag=d036dd2d-c27b-427e-9efd-5006de2ace89&flag=9495a8de-049f-4f02-a2a5-4e06589cba6a&flag=fef57000-3b84-4dc4-bace-bef4676eefc9&flag=3723e39c-cf1c-4287-ac38-a262148f74b3&flag=69d4afa1-20f9-4375-b566-50861f3e4e9f&flag=db41be6e-e79e-4156-9c4b-f7fc52183402" class="h-48 w-full object-cover" alt="Property"/>
-                        <div class="p-6">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">Luxury Student Suite</h3>
-                                    <p class="text-sm text-gray-500">Downtown Campus</p>
-                                </div>
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 !rounded-button">Coming Soon</span>
-                            </div>
-                            <div class="mt-4 flex items-center text-sm text-gray-500">
-                                <i class="fas fa-bed mr-2"></i>
-                                <span class="mr-4">2 Beds</span>
-                                <i class="fas fa-bath mr-2"></i>
-                                <span class="mr-4">2 Baths</span>
-                                <i class="fas fa-ruler-combined mr-2"></i>
-                                <span>800 sq ft</span>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-custom">$1200/mo</span>
-                                <button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium">View Details</button>
-                            </div>
-                        </div>
-                    </div> -->
+
                 </div>
             </div>
         </section>
@@ -214,3 +198,6 @@
             </div>
         </div>
     </footer>
+
+</body>
+</html>

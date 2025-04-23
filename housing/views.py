@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_protect 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login, logout
+from django.forms import modelformset_factory
+from django.contrib import messages
 
 from .forms import CustomAuthenticationForm, SignUpForm, AccommodationForm, AccommodationImageForm, AccommodationImageFormSet
 
@@ -10,7 +12,69 @@ from .models import CustomUser, Accommodation, AccommodationImage
 
 # Home Page
 def home(request):
-    return render(request, "index.html")
+    return render(request, "student/index.html")
+
+
+def studentDetails(request):
+    return render(request, "student/viewDetailsStudent.html")
+
+
+def studentProperties(request):
+    return render(request, "student/properties.html")
+
+# def editProperty(request):
+#     return render(request, "editProperty.html")
+
+@login_required
+def view_property(request, property_id):
+    property = get_object_or_404(Accommodation, pk=property_id, landlord=request.user)
+    existing_images = property.images.all()
+    return render(request, 'landlord/viewdetailLandlord.html', {
+        'property': property,
+        'existing_images': existing_images
+    })
+
+@login_required
+def edit_property(request, property_id):
+    property_obj = get_object_or_404(Accommodation, pk=property_id, landlord=request.user)
+    editing = request.method == 'POST'
+
+    if editing:
+        form = AccommodationForm(request.POST, request.FILES, instance=property_obj)
+        image_formset = AccommodationImageFormSet(
+            request.POST, request.FILES,
+            queryset=AccommodationImage.objects.filter(accommodation=property_obj)
+        )
+
+        if form.is_valid() and image_formset.is_valid():
+            form.save()
+
+            for image_form in image_formset:
+                if image_form.cleaned_data:
+                    image = image_form.save(commit=False)
+                    image.accommodation = property_obj
+                    image.save()
+
+            return redirect('housing:edit_property', property_id=property_obj.pk)
+    else:
+        form = AccommodationForm(instance=property_obj)
+        image_formset = AccommodationImageFormSet(queryset=AccommodationImage.objects.filter(accommodation=property_obj))
+
+    return render(request, 'landlord/editProperty.html', {
+        'form': form,
+        'image_formset': image_formset,
+        'property': property_obj,
+        'existing_images': AccommodationImage.objects.filter(accommodation=property_obj),
+        'editing': editing
+    })
+
+@login_required
+def delete_image(request, image_id):
+    image = get_object_or_404(AccommodationImage, pk=image_id)
+    property_id = image.accommodation.pk
+    if request.user == image.accommodation.landlord:
+        image.delete()
+    return redirect('housing:edit_property', property_id=property_id)
 
 @login_required
 def landlord_home(request):
@@ -26,7 +90,7 @@ def landlord_home(request):
         )
     )
     
-    return render(request, "landlordIndex.html", {'accommodations': accommodations})
+    return render(request, "landlord/landlordIndex.html", {'accommodations': accommodations})
 
 
 
@@ -44,6 +108,7 @@ def add_property(request):
             accommodation = form.save(commit=False)
             accommodation.landlord = request.user
             accommodation.save()
+            print("New accommodation ID:", accommodation.accommodation_id)
             
             for form in image_formset:
                 image = form.save(commit=False)
@@ -52,11 +117,17 @@ def add_property(request):
             return redirect('housing:landlord_home')    # Or redirect to another page
         
         else:
-            return render(request, 'addProperty.html', {'form': form, 'image_formset': image_formset})
+            return render(request, 'landlord/addProperty.html', {'form': form, 'image_formset': image_formset})
     else:
         form = AccommodationForm()
         image_formset = AccommodationImageFormSet(queryset=AccommodationImage.objects.none())
     return render(request, 'addProperty.html', {'form': form, 'image_formset': image_formset})
+
+
+
+
+
+
 
 
 
@@ -87,7 +158,7 @@ def user_login(request):  # Renamed to avoid conflict
     else:
         form = CustomAuthenticationForm()
     
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login-signup/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
@@ -112,10 +183,11 @@ def register(request):
     else:
         form = SignUpForm()
     
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'login-signup/register.html', {'form': form})
 
 
-# housing/views.py
+
+
 
 
 

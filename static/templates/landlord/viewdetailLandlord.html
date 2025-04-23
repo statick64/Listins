@@ -1,0 +1,160 @@
+
+{% load static %}
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ property.title }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
+  <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000" data-border-radius="small"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#6366f1'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      body {
+      font-family: 'Inter', sans-serif;
+      }
+      .property-card:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease;
+      }
+
+
+
+  </style>
+
+</head>
+
+<body class="bg-gray-50 font-sans">
+  
+  <nav class="bg-white shadow-sm fixed w-full z-50">
+      <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+              <div class="flex">
+                  <div class="flex-shrink-0 flex items-center">
+                      <img class="h-8 w-auto" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" alt="Logo"/>
+                  </div>
+                  <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                      {% if user.user_type ==  'Landlord'%}
+                          <a href="{% url 'housing:landlord_home' %}" class="border-custom text-custom inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+                      {% else %}
+                          <a href="{% url 'housing:index' %}" class="border-custom text-custom inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+                      {% endif %}
+                      <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Properties</a>
+                      <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">About</a>
+                      <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
+                  </div>
+              </div>
+              {% if user.is_authenticated %}
+                  <div class="flex items-center"><div class="relative"><button class="flex items-center !rounded-button bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200" onclick="document.getElementById(&#34;user-dropdown&#34;).classList.toggle(&#34;hidden&#34;)"><img src="{% static 'images/placeholder.jpg' %}" class="h-6 w-6 rounded-full mr-2" /><span>{{ user.first_name }} </span><i class="fas fa-chevron-down ml-2"></i></button><div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a><div class="border-t border-gray-100"></div><a href="{% url 'housing:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a></div></div></div>
+              {% else %}
+                  <div class="flex items-center">
+                      <a href="{% url 'housing:login' %}"><button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium mr-3"> Sign In</button></a>
+                      <a href="{% url 'housing:register' %}"><button class="!rounded-button border border-custom text-custom px-4 py-2 text-sm font-medium">Register</button></a>
+                  </div>
+              {% endif %}
+          </div>
+      </div>
+  </nav>
+
+  <main class="pt-16">
+    <section class="relative bg-white py-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Property Details</h2>
+
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700">Property Name:</h3>
+              <p class="text-gray-900">{{ property.title }}</p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700">Price:</h3>
+              <p class="text-gray-900">P{{ property.price }}/mo</p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700">Location:</h3>
+              <p class="text-gray-900">{{ property.city }}, {{ property.state }}</p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700">Bedrooms / Bathrooms:</h3>
+              <p class="text-gray-900">{{ property.bedrooms }} Bed / {{ property.bathrooms }} Bath</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <h3 class="text-lg font-semibold text-gray-700">Description:</h3>
+              <p class="text-gray-900">{{ property.description }}</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <h3 class="text-lg font-semibold text-gray-700">Main Image:</h3>
+              <img src="{{ property.main_image.url }}" class="w-full max-w-sm rounded-lg shadow" alt="Main Image">
+            </div>
+
+            {% if existing_images %}
+            <div class="md:col-span-2">
+              <h3 class="text-md font-semibold text-gray-700 mb-2">Other Images:</h3>
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {% for img in existing_images %}
+                <div class="relative">
+                  <img src="{{ img.image.url }}" alt="Property Image" class="w-full h-28 object-cover rounded-md">
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <a href="{% url 'housing:edit_property' property.accommodation_id %}" class="inline-block mt-6 px-6 py-2 bg-primary text-white rounded-lg">Edit Property</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="bg-gray-900">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <img class="h-8 w-auto" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" alt="Logo"/>
+                <p class="mt-4 text-base text-gray-400">Making student housing search simple and secure.</p>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
+                <ul class="mt-4 space-y-4">
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">About</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Careers</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Support</h3>
+                <ul class="mt-4 space-y-4">
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Help Center</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Safety Center</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Legal</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Follow Us</h3>
+                <ul class="mt-4 space-y-4">
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Facebook</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Twitter</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mt-8 border-t border-gray-700 pt-8">
+            <p class="text-base text-gray-400 text-center">© 2024 Student Housing Platform. All rights reserved.</p>
+        </div>
+    </div>
+  </footer>
+
+</body>
+</html>

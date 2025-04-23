@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from cloudinary.models import CloudinaryField
+
 
 
 
@@ -37,10 +39,11 @@ class Accommodation(models.Model):
     ('Hostel', 'Hostel'),
     ('Single Room', 'Single Room'),
     ('Shared Room', 'Shared Room'),
-]
+    ]
     accommodation_id = models.AutoField(primary_key=True)
     landlord = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Landlord'})
     
+    main_image = CloudinaryField('Main Building Image')
     title = models.CharField(max_length=255)
     property_type = models.CharField(max_length=20, choices=PROPERTY_TYPE_CHOICES, default=" ")
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
@@ -61,7 +64,7 @@ class Accommodation(models.Model):
     
 class AccommodationImage(models.Model):
     accommodation = models.ForeignKey(Accommodation, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='accommodations/')
+    image = CloudinaryField('image')
 
     def __str__(self):
         return f"Image for {self.accommodation}"

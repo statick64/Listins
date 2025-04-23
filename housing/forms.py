@@ -178,6 +178,11 @@ class AccommodationForm(forms.ModelForm):
         'rows': 4,
         'required': '',
     }))
+    
+    main_image = forms.ImageField(widget=forms.FileInput(attrs={
+        'class': 'hidden file-input',
+        'accept': 'image/*'
+    }))
 
     
     status = forms.ChoiceField(choices=STATUS_CHOICES, widget=forms.Select(attrs={
@@ -193,7 +198,7 @@ class AccommodationForm(forms.ModelForm):
         fields = [
             'property_type', 'price', 'address', 'city', 'state',
             'bedrooms', 'bathrooms', 'square_footage',
-            'description', 'status', 'title'
+            'description', 'status', 'title', 'main_image'
         ]
     
     
@@ -212,7 +217,6 @@ class AccommodationImageForm(forms.ModelForm):
     }))
     
 
-
     class Meta:
         model = AccommodationImage
         fields = ['image']
@@ -220,6 +224,6 @@ class AccommodationImageForm(forms.ModelForm):
 AccommodationImageFormSet = forms.modelformset_factory(
     AccommodationImage,
     form=AccommodationImageForm,
-    extra=5,  # Number of empty forms to display
+    extra=3,  # Number of empty forms to display
     can_delete=True
 )

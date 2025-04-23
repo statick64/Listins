@@ -175,6 +175,19 @@
             </div> -->
 
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 w-full">
+                <div class="flex flex-col items-center justify-center">
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                            <p class="text-xs filename-display text-gray-500">Upload {{ form.main_image.name }}</p>
+                        </div>
+                        {{ form.main_image }}
+                    </label>
+                    {% if form.errors %}
+                        <p class="text-xs text-red-600 mt-1">{{ image_formset.errors.main_image }}</p>
+                    {% endif %}
+                </div>
+                
                 {{ image_formset.management_form }}
                 {% for form in image_formset %}
                     <div class="flex flex-col items-center justify-center">
