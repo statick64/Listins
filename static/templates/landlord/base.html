@@ -29,6 +29,7 @@
 </head>
 
 <body class="bg-gray-50 font-sans">
+
   
   <nav class="bg-white shadow-sm fixed w-full z-50">
       <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -59,3 +60,56 @@
           </div>
       </div>
   </nav>
+    <!-- {% if messages %}
+        <div class="max-w-2xl mx-auto mt-6">
+        {% for message in messages %}
+            <div class="mb-4 px-4 py-3 rounded-lg shadow-md {{ message.tags|default:'info' }}"
+                style="background-color: {% if message.tags == 'success' %}#e6fffa{% elif message.tags == 'error' %}#ffe6e6{% elif message.tags == 'warning' %}#fffbe6{% else %}#f0f4f8{% endif %}; color: #222;">
+            {{ message }}
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %} -->
+  {% block content %}
+  <!-- Page-specific content goes here -->
+  {% endblock %}
+  <footer class="bg-gray-900">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <img class="h-8 w-auto" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" alt="Logo"/>
+                <p class="mt-4 text-base text-gray-400">Making student housing search simple and secure.</p>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
+                <ul class="mt-4 space-y-4">
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">About</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Careers</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Support</h3>
+                <ul class="mt-4 space-y-4">
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Help Center</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Safety Center</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Legal</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Follow Us</h3>
+                <ul class="mt-4 space-y-4">
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Facebook</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Twitter</a></li>
+                    <li><a href="#" class="text-base text-gray-300 hover:text-white">Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mt-8 border-t border-gray-700 pt-8">
+            <p class="text-base text-gray-400 text-center">© 2024 Student Housing Platform. All rights reserved.</p>
+        </div>
+    </div>
+  </footer>
+
+</body>
+</html>

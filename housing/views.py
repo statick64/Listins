@@ -9,6 +9,8 @@ from .forms import CustomAuthenticationForm, SignUpForm, AccommodationForm, Acco
 
 from django.db.models import Prefetch
 from .models import CustomUser, Accommodation, AccommodationImage
+from django.core.exceptions import PermissionDenied
+import cloudinary.uploader
 
 # Home Page
 def home(request):
@@ -24,6 +26,26 @@ def studentProperties(request):
 
 # def editProperty(request):
 #     return render(request, "editProperty.html")
+
+@login_required
+def delete_main_image(request, property_id):
+    property_obj = get_object_or_404(Accommodation, pk=property_id)
+    if request.user != property_obj.landlord:
+        raise PermissionDenied
+    if property_obj.main_image:
+        try:
+            public_id = property_obj.main_image.public_id if hasattr(property_obj.main_image, 'public_id') else None
+            if public_id:
+                cloudinary.uploader.destroy(public_id)
+            property_obj.main_image = None
+            property_obj.save()
+            messages.success(request, "Main image deleted successfully.")
+        except Exception as e:
+            messages.error(request, f"Failed to delete main image: {e}")
+    else:
+        messages.error(request, "No main image to delete.")
+    return redirect('housing:edit_property', property_id=property_id)
+
 
 @login_required
 def view_property(request, property_id):
@@ -55,12 +77,13 @@ def edit_property(request, property_id):
                     image.accommodation = property_obj
                     image.save()
 
+            messages.success(request, "Property updated successfully!")
             return redirect('housing:edit_property', property_id=property_obj.pk)
     else:
         form = AccommodationForm(instance=property_obj)
         image_formset = AccommodationImageFormSet(queryset=AccommodationImage.objects.filter(accommodation=property_obj))
 
-    return render(request, 'landlord/editProperty.html', {
+    return render(request, 'landlord/editdetailLandlord.html', {
         'form': form,
         'image_formset': image_formset,
         'property': property_obj,
@@ -73,7 +96,18 @@ def delete_image(request, image_id):
     image = get_object_or_404(AccommodationImage, pk=image_id)
     property_id = image.accommodation.pk
     if request.user == image.accommodation.landlord:
-        image.delete()
+        # Delete from Cloudinary
+        try:
+            if image.image:
+                public_id = image.image.public_id if hasattr(image.image, 'public_id') else None
+                if public_id:
+                    cloudinary.uploader.destroy(public_id)
+            image.delete()
+            messages.success(request, "Image deleted successfully.")
+        except Exception as e:
+            messages.error(request, f"Failed to delete image: {e}")
+    else:
+        messages.error(request, "You do not have permission to delete this image.")
     return redirect('housing:edit_property', property_id=property_id)
 
 @login_required
