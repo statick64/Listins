@@ -2,6 +2,24 @@
 {% load static %}
 
   {% block content %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInputs = document.querySelectorAll('.file-input');
+
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const filenameSpan = input.closest('label').querySelector('.filename-display');
+                if (input.files.length > 0) {
+                    filenameSpan.textContent = input.files[0].name;
+                    filenameSpan.classList.remove('hidden');
+                } else {
+                    filenameSpan.textContent = '';
+                    filenameSpan.classList.add('hidden');
+                }
+            });
+        });
+    });
+  </script>
   <main class="pt-16">
     <section class="relative bg-white py-12">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,6 +28,17 @@
         <form method="POST" enctype="multipart/form-data" class="space-y-6">
           {% csrf_token %}
           {{ form.non_field_errors }}
+          {% for field in form %}
+            {% for error in field.errors %}
+              <div class="text-red-500 text-sm">{{ error }}</div>
+            {% endfor %}
+          {% endfor %}
+
+          {% for form in image_formset %}
+            {% for error in form.errors %}
+              <div class="text-red-500 text-sm">{{ error }}</div>
+            {% endfor %}
+          {% endfor %}
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -18,8 +47,23 @@
             </div>
 
             <div>
+              <label class="block text-sm font-medium text-gray-700">Property Type</label>
+              {{ form.property_type }}
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Status</label>
+              {{ form.status }}
+            </div>
+
+            <div>
               <label class="block text-sm font-medium text-gray-700">Price (BWP)</label>
               {{ form.price }}
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Address</label>
+              {{ form.address }}
             </div>
 
             <div>
@@ -42,6 +86,11 @@
               {{ form.bathrooms }}
             </div>
 
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Bathrooms</label>
+              {{ form.square_footage }}
+            </div>
+
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700">Description</label>
               {{ form.description }}
@@ -55,8 +104,20 @@
                   <a href="{% url 'housing:delete_main_image' property.accommodation_id %}" class="px-2 py-1 bg-red-600 text-white text-xs rounded" onclick="return confirm('Are you sure you want to delete the main image? This will remove it permenently.');"> Delete </a>
                 </div>
                 <span class="text-xs text-gray-500">Change main image:</span>
+              {% else %}
+                <div class="flex flex-col items-center justify-center">
+                  <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                      <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                          <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                          <p class="text-xs filename-display text-gray-500">Upload {{ form.main_image.name }}</p>
+                      </div>
+                      {{ form.main_image }}
+                  </label>
+                  {% if form.errors %}
+                      <p class="text-xs text-red-600 mt-1">{{ image_formset.errors.main_image }}</p>
+                  {% endif %}
+                </div>
               {% endif %}
-              {{ form.main_image }}
             </div>
 
             {% if existing_images %}
@@ -79,15 +140,23 @@
               {{ image_formset.management_form }}
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                 {% for form in image_formset %}
-                <div>
-                  {{ form.image }}
-                </div>
+                    <div class="flex flex-col items-center justify-center">
+                        <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                                <p class="text-xs filename-display text-gray-500">Upload {{ form.image.name }}</p>
+                            </div>
+                            {{ form.image }}
+                        </label>
+                        {% if form.errors %}
+                            <p class="text-xs text-red-600 mt-1">{{ form.errors.image }}</p>
+                        {% endif %}
+                    </div>
                 {% endfor %}
               </div>
             </div>
           </div>
-
-          <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg mt-6">Update Property</button>
+          <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg mt-6" title="Save all changes to this property and its images" id="update-btn">Update Property</button>
         </form>
       </div>
     </section>

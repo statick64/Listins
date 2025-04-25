@@ -139,40 +139,7 @@
                     </div>
                 </div>
             </div>
-<!-- 
-            <div class="bg-white shadow-sm rounded-lg p-6">
-                <h2 class="text-xl font-medium text-gray-900 mb-6">Property Images</h2>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-center w-full">                        <label class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>                                <p class="text-xs text-gray-500">PNG, JPG or GIF (MAX. 800x400px)</p>
-                            </div>                            <input type="file" class="hidden" multiple accept="image/*" id="{{ image_formset.image.id_for_label }}" name="{{ image_formset.image.name }}"> 
-                                {{ image_formset.management_form }}
 
-                                <div class="space-y-4">
-                                {% for image_form in image_formset %}
-                                    <div class="mb-4">
-                                    {{ image_form.image.label_tag }}
-                                    {{ image_form.image }}
-                                    </div>
-                                {% endfor %}
-                                </div>
-                        </label>
-                    </div>                    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div class="relative group">
-                            <img src="https://creatie.ai/ai/api/search-image?query=A modern luxury apartment interior with clean lines and natural light, featuring a spacious living room with floor-to-ceiling windows, contemporary furniture, and neutral color scheme. The image shows a well-staged property photo against a simple, uncluttered background.&width=300&height=200&flag=66eb9452-3f31-42d3-938a-6dd006feb443" alt="Property preview" class="w-full h-40 object-cover rounded-lg">                            <button type="button" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>                    </div>
-                </div>
-            </div> -->
-
-            <!-- <div class="bg-white shadow-sm rounded-lg p-6">
-                <h2 class="text-xl font-medium text-gray-900 mb-6">Property Images</h2>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-center w-full"><div class="grid grid-cols-1 md:grid-cols-5 gap-4 w-full"><div class="flex flex-col items-center justify-center"><label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"><div class="flex flex-col items-center justify-center pt-5 pb-6"><i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i><p class="text-xs text-gray-500">Upload Image 1</p></div><input type="file" name="form-0-image" class="hidden" accept="image/*"/></label></div><div class="flex flex-col items-center justify-center"><label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"><div class="flex flex-col items-center justify-center pt-5 pb-6"><i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i><p class="text-xs text-gray-500">Upload Image 2</p></div><input type="file" name="form-1-image" class="hidden" accept="image/*"/></label></div><div class="flex flex-col items-center justify-center"><label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"><div class="flex flex-col items-center justify-center pt-5 pb-6"><i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i><p class="text-xs text-gray-500">Upload Image 3</p></div><input type="file" name="form-2-image" class="hidden" accept="image/*"/></label></div><div class="flex flex-col items-center justify-center"><label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"><div class="flex flex-col items-center justify-center pt-5 pb-6"><i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i><p class="text-xs text-gray-500">Upload Image 4</p></div><input type="file" name="form-3-image" class="hidden" accept="image/*"/></label></div><div class="flex flex-col items-center justify-center"><label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"><div class="flex flex-col items-center justify-center pt-5 pb-6"><i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i><p class="text-xs text-gray-500">Upload Image 5</p></div><input type="file" name="form-4-image" class="hidden" accept="image/*"/></label></div></div></div>
-                    <div class="grid grid-cols-2 gap-4 md:grid-cols-5"></div>
-                </div>
-            </div> -->
 
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 w-full">
                 <div class="flex flex-col items-center justify-center">
@@ -220,7 +187,6 @@
             </div>
         {% endif %}
             <div class="flex justify-end space-x-4">
-                <button type="button" class="!rounded-button px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom">Save as Draft</button>
                 <button type="submit" class="!rounded-button px-4 py-2 border border-transparent text-sm font-medium text-white bg-custom hover:bg-custom/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom">Publish Property</button>
             </div>
             {% csrf_token %}
@@ -259,7 +225,7 @@
                 </div>
             </div>
             <div class="mt-8 border-t border-gray-700 pt-8">
-                <p class="text-base text-gray-400 text-center">© 2024 Student Housing Platform. All rights reserved.</p>
+                <p class="text-base text-gray-400 text-center">© 2024 Linstins Housing Platform. All rights reserved.</p>
             </div>
         </div>
     </footer>

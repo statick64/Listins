@@ -16,6 +16,9 @@ import cloudinary.uploader
 def home(request):
     return render(request, "student/index.html")
 
+def landlord_contact(request):
+    return render(request, "landlord/LandlordContact.html")
+
 
 def studentDetails(request):
     return render(request, "student/viewDetailsStudent.html")
@@ -56,29 +59,31 @@ def view_property(request, property_id):
         'existing_images': existing_images
     })
 
+@csrf_protect
 @login_required
 def edit_property(request, property_id):
     property_obj = get_object_or_404(Accommodation, pk=property_id, landlord=request.user)
-    editing = request.method == 'POST'
+    
 
-    if editing:
+    if request.method == 'POST':
         form = AccommodationForm(request.POST, request.FILES, instance=property_obj)
         image_formset = AccommodationImageFormSet(
             request.POST, request.FILES,
             queryset=AccommodationImage.objects.filter(accommodation=property_obj)
         )
-
+        print("Form errors:", form.errors)
+        print("Formset errors:", image_formset.errors)
         if form.is_valid() and image_formset.is_valid():
             form.save()
-
             for image_form in image_formset:
                 if image_form.cleaned_data:
                     image = image_form.save(commit=False)
                     image.accommodation = property_obj
                     image.save()
-
             messages.success(request, "Property updated successfully!")
             return redirect('housing:edit_property', property_id=property_obj.pk)
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AccommodationForm(instance=property_obj)
         image_formset = AccommodationImageFormSet(queryset=AccommodationImage.objects.filter(accommodation=property_obj))
@@ -88,7 +93,6 @@ def edit_property(request, property_id):
         'image_formset': image_formset,
         'property': property_obj,
         'existing_images': AccommodationImage.objects.filter(accommodation=property_obj),
-        'editing': editing
     })
 
 @login_required
@@ -127,6 +131,13 @@ def landlord_home(request):
     return render(request, "landlord/landlordIndex.html", {'accommodations': accommodations})
 
 
+@login_required
+def landlord_properties(request):
+    # Only show properties where the logged-in user is the landlord
+    properties = Accommodation.objects.filter(landlord=request.user)
+    return render(request, 'landlord/LandlordProperties.html', {'properties': properties})
+
+
 
 
 
@@ -155,7 +166,7 @@ def add_property(request):
     else:
         form = AccommodationForm()
         image_formset = AccommodationImageFormSet(queryset=AccommodationImage.objects.none())
-    return render(request, 'addProperty.html', {'form': form, 'image_formset': image_formset})
+    return render(request, 'landlord/addProperty.html', {'form': form, 'image_formset': image_formset})
 
 
 

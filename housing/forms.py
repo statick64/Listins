@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 
-from .models import Accommodation, AccommodationImage
+from .models import Accommodation, AccommodationImage, Booking
 
 User = get_user_model()  # This ensures you're using the correct user model
 
@@ -227,3 +227,28 @@ AccommodationImageFormSet = forms.modelformset_factory(
     extra=3,  # Number of empty forms to display
     can_delete=True
 )
+
+
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['start_date', 'end_date']
+
+
+
+class ContactSupportForm(forms.Form):
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
+        'placeholder': 'Your Name',
+        'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary',
+        'name': 'name'
+    }))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'placeholder': 'Your Email'
+    }))
+    subject = forms.CharField(max_length=150, widget=forms.TextInput(attrs={
+        'placeholder': 'Subject'
+    }))
+    message = forms.CharField(widget=forms.Textarea(attrs={
+        'placeholder': 'Type your message here...',
+        'rows': 6
+    }))

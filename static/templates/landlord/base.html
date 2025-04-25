@@ -40,13 +40,28 @@
                   </div>
                   <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                       {% if user.user_type ==  'Landlord'%}
-                          <a href="{% url 'housing:landlord_home' %}" class="border-custom text-custom inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+                          <a href="{% url 'housing:landlord_home' %}"
+                             class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'landlord_home' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
+                             Home
+                          </a>
                       {% else %}
-                          <a href="{% url 'housing:index' %}" class="border-custom text-custom inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+                          <a href="{% url 'housing:index' %}"
+                             class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'index' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
+                             Home
+                          </a>
                       {% endif %}
-                      <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Properties</a>
-                      <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">About</a>
-                      <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
+                      <a href="{% url 'housing:landlord_properties' %}"
+                         class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'landlord_properties' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
+                         Properties
+                      </a>
+                      <a href="#"
+                         class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'about' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
+                         About
+                      </a>
+                      <a href="#"
+                         class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'contact' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
+                         Contact
+                      </a>
                   </div>
               </div>
               {% if user.is_authenticated %}
@@ -106,7 +121,7 @@
             </div>
         </div>
         <div class="mt-8 border-t border-gray-700 pt-8">
-            <p class="text-base text-gray-400 text-center">© 2024 Student Housing Platform. All rights reserved.</p>
+            <p class="text-base text-gray-400 text-center">© 2024 Linstins Housing Platform. All rights reserved.</p>
         </div>
     </div>
   </footer>
