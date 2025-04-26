@@ -229,10 +229,6 @@ AccommodationImageFormSet = forms.modelformset_factory(
 )
 
 
-class BookingForm(forms.ModelForm):
-    class Meta:
-        model = Booking
-        fields = ['start_date', 'end_date']
 
 
 
@@ -243,12 +239,20 @@ class ContactSupportForm(forms.Form):
         'name': 'name'
     }))
     email = forms.EmailField(widget=forms.EmailInput(attrs={
-        'placeholder': 'Your Email'
+        'placeholder': 'Your Email',
+        'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary',
+        'name': 'email'
     }))
     subject = forms.CharField(max_length=150, widget=forms.TextInput(attrs={
-        'placeholder': 'Subject'
+        'placeholder': 'Subject',
+        'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary',
+        'name': 'subject'
+        
+        
     }))
     message = forms.CharField(widget=forms.Textarea(attrs={
         'placeholder': 'Type your message here...',
-        'rows': 6
+        'rows': 6,
+        'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary',
+        'name': 'message'
     }))

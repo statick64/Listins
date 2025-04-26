@@ -54,11 +54,11 @@
                          class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'landlord_properties' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
                          Properties
                       </a>
-                      <a href="#"
+                      <a href="{% url 'housing:landlord_contact' %}"
                          class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'about' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
                          About
                       </a>
-                      <a href="#"
+                      <a href="{% url 'housing:landlord_contact' %}"
                          class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'contact' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
                          Contact
                       </a>
