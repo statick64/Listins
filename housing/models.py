@@ -32,6 +32,29 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+
+class LandlordProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='landlord_profile')
+    address = models.CharField(max_length=255, blank=True)
+    profile_image = CloudinaryField('image', blank=True, null=True)  # Or use models.ImageField(upload_to='profile_images/')
+    
+    # Verification
+    document_type = models.CharField(max_length=50, blank=True, choices=[
+        ('passport', 'Passport'),
+        ('national_id', 'National ID'),
+        ('driver_license', 'Driver License'),
+    ])
+    verification_document = CloudinaryField('image', blank=True, null=True)
+    verification_status = models.CharField(max_length=20, default='Pending', choices=[
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected')
+    ])
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
+
+
 class Accommodation(models.Model):
     
     PROPERTY_TYPE_CHOICES = [
@@ -57,6 +80,7 @@ class Accommodation(models.Model):
     status = models.CharField(max_length=20, choices=[('Available', 'Available'), ('Booked', 'Booked'), ('Coming Soon', 'Coming Soon')], default='Available')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_verified = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.property_type} in {self.city} - {self.price}"
@@ -122,3 +146,19 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification {self.notification_id} - {self.status}"
+
+
+class PropertyVerificationDocument(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('reviewed', 'Reviewed'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    accommodation = models.ForeignKey(Accommodation, on_delete=models.CASCADE, related_name='verification_documents')
+    document = CloudinaryField('document')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    def __str__(self):
+        return f"Verification Doc for {self.accommodation.title} - {self.status}"

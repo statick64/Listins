@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 
-from .models import Accommodation, AccommodationImage, Booking
+from .models import Accommodation, AccommodationImage, Booking, LandlordProfile, PropertyVerificationDocument
 
 User = get_user_model()  # This ensures you're using the correct user model
 
@@ -115,7 +115,14 @@ class SignUpForm(UserCreationForm):
 
 
 
-
+class LandlordProfileForm(forms.ModelForm):
+    class Meta:
+        model = LandlordProfile
+        fields = ['address', 'profile_image', 'document_type', 'verification_document']
+        widgets = {
+            'address': forms.TextInput(attrs={'class': 'w-full mt-1 p-2 bg-green-100 rounded'}),
+            'document_type': forms.Select(attrs={'class': 'w-full mt-1 p-2 bg-green-100 rounded'}),
+        }
 
 
 class AccommodationForm(forms.ModelForm):
@@ -231,6 +238,17 @@ AccommodationImageFormSet = forms.modelformset_factory(
 
 
 
+
+class PropertyVerificationDocumentForm(forms.ModelForm):
+    class Meta:
+        model = PropertyVerificationDocument
+        fields = ['document']
+        widgets = {
+            'document': forms.ClearableFileInput(attrs={
+                'class': 'block w-full mt-1 p-2 border rounded',
+                'accept': 'image/*,application/pdf',
+            })
+        }
 
 class ContactSupportForm(forms.Form):
     name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={

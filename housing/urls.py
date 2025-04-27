@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from .views import LandlordPasswordChangeView
 
 app_name = 'housing'
 
@@ -16,8 +17,11 @@ urlpatterns = [
     path('studentDetials', views.studentDetails, name='studentDetials'),
     path('studentProperties', views.studentProperties, name='studentProperties'),
     path('landlordProperty', views.landlord_properties, name='landlord_properties'),
+    path('profile/', views.landlord_profile, name='landlord_profile'),
+    path('password_change/', LandlordPasswordChangeView.as_view(), name='password_change'),
     path('property/<int:property_id>/view/', views.view_property, name='view_property'),
     path('property/<int:property_id>/edit/', views.edit_property, name='edit_property'),
+    path('property/<int:property_id>/verify/', views.property_verification_upload, name='property_verification_upload'),
     path('property/image/<int:image_id>/delete/', views.delete_image, name='delete_image'),
     path('property/<int:property_id>/delete_main_image/', views.delete_main_image, name='delete_main_image'),
     

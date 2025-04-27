@@ -1,0 +1,137 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="pt-16">
+  <section class="relative bg-white py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-8">Profile Settings</h2>
+
+      {% if creating_profile %}
+        <div class="mb-8 p-4 bg-blue-50 border border-blue-200 rounded">
+          <p class="text-blue-700">You have not created a profile yet. Please fill out the form below to create your landlord profile.</p>
+        </div>
+      {% endif %}
+
+      <form method="POST" enctype="multipart/form-data" class="space-y-12">
+        {% csrf_token %}
+
+        <!-- Personal Information -->
+        <div class="bg-gray-100 p-6 rounded-lg">
+          <h3 class="text-2xl font-semibold text-gray-800 mb-4">Personal Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
+              <input type="text" value="{{ user.first_name }} {{ user.last_name }}" disabled class="w-full mt-1 p-2 bg-green-100 rounded" />
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+              <input type="email" value="{{ user.email }}" disabled class="w-full mt-1 p-2 bg-green-100 rounded" />
+            </div>
+
+            
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2">Address</label>
+              {{ form.address }}
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-gray-700 text-sm font-medium mb-2">Profile Image</label>
+              {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" class="h-24 w-24 rounded-full object-cover mb-4">
+              {% endif %}
+              {{ form.profile_image }}
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="bg-gray-100 p-6 rounded-lg">
+          <h3 class="text-2xl font-semibold text-gray-800 mb-4">Account Settings</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2">Document Type</label>
+              {{ form.document_type }}
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-medium mb-2">Upload Verification Document</label>
+              {{ form.verification_document }}
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-gray-700 text-sm font-medium mb-2">Verification Status</label>
+              <p class="text-lg font-semibold {% if profile.verification_status == 'verified' %}text-green-600{% elif profile.verification_status == 'pending' %}text-yellow-500{% else %}text-red-600{% endif %}">
+                {{ profile.verification_status|title }}
+              </p>
+            </div>
+
+            <div class="md:col-span-2">
+              <a href="{% url 'housing:password_change' %}" class="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary">
+                Change Password
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+            <!-- Property Review Status -->
+        <div class="bg-gray-100 p-6 rounded-lg">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Property Review Status</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                    <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Property Title</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Verification Status</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    {% for property in properties %}
+                    <tr>
+                        <td class="py-3 px-4">{{ property.title }}</td>
+                        <td class="py-3 px-4">
+                            {% if property.is_verified %}
+                                <span class="text-green-600 font-semibold">Verified</span>
+                            {% else %}
+                                {% with pending_doc=property.verification_documents.last %}
+                                    {% if pending_doc and pending_doc.status == 'pending' %}
+                                        <span class="text-yellow-600 font-semibold">Pending Verification</span>
+                                    {% else %}
+                                        <div class="flex items-center space-x-2">
+                                            <i class="fas fa-times-circle text-red-500"></i>
+                                            <span class="text-red-600 font-semibold">Not Verified</span>
+                                            <a href="{% url 'housing:property_verification_upload' property.accommodation_id %}" class="ml-4 px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Verify</a>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center py-6 text-gray-400">No Properties Listed Yet</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+  
+
+        <div class="text-center">
+          <button type="submit" class="mt-6 px-8 py-3 bg-primary hover:bg-secondary text-white text-lg rounded-lg">
+            Save Changes
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</main>
+{% endblock %}

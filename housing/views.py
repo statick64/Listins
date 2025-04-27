@@ -6,73 +6,79 @@ from django.forms import modelformset_factory
 from django.contrib import messages
 from django.conf import settings
 from mailjet_rest import Client
-import os
+
 
 from django.core import mail
 from django.core.mail.message import EmailMessage
 
-from .forms import CustomAuthenticationForm, SignUpForm, AccommodationForm, AccommodationImageForm, AccommodationImageFormSet, ContactSupportForm
+from .forms import CustomAuthenticationForm, SignUpForm, AccommodationForm, AccommodationImageForm, AccommodationImageFormSet, ContactSupportForm, LandlordProfileForm
 
 from django.db.models import Prefetch
-from .models import CustomUser, Accommodation, AccommodationImage
+from .models import CustomUser, Accommodation, AccommodationImage, LandlordProfile, PropertyVerificationDocument
+from .forms import PropertyVerificationDocumentForm
 from django.core.exceptions import PermissionDenied
 import cloudinary.uploader
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse_lazy
 
 # Home Page
 def home(request):
     return render(request, "student/index.html")
 
+@csrf_protect
 def landlord_contact(request):
+    contact_success = False
+    error_message = ''
     if request.method == 'POST':
         form = ContactSupportForm(request.POST)
         if form.is_valid():
             email =   request.POST.get('email')
             subject =   request.POST.get('subject')
             name =   request.POST.get('name')
-            
-            print(email, subject, name)
-            
+            message =   request.POST.get('message')
 
-            # api_key = os.environ['MJ_APIKEY_PUBLIC']
-            # api_secret = os.environ['MJ_APIKEY_PRIVATE']
-            # mailjet = Client(auth=(api_key, api_secret), version='v3.1')
-            # data = {
-            # 'Messages': [
-            #                 {
-            #                         "From": {
-            #                                 "Email": "$SENDER_EMAIL",
-            #                                 "Name": "Me"
-            #                         },
-            #                         "To": [
-            #                                 {
-            #                                         "Email": "$RECIPIENT_EMAIL",
-            #                                         "Name": "You"
-            #                                 }
-            #                         ],
-            #                         "Subject": "My first Mailjet Email!",
-            #                         "TextPart": "Greetings from Mailjet!",
-            #                         "HTMLPart": "<h3>Dear passenger 1, welcome to <a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3><br />May the delivery force be with you!"
-            #                 }
-            #         ]
-            # }
-            # result = mailjet.send.create(data=data)
-            # print result.status_code
-            # print result.json()
-            
-            
             connection = mail.get_connection()
             connection.open()
-            message2 = f'Hello {name}, Thank you for contacting Listins.  An Agent will contact you shortly.\n\nKind regards\nListins Services Team'
-            mail.EmailMessage(subject, message2, settings.EMAIL_HOST_USER, [email],connection=connection).send()
-            messages.success(request, 'Success!')
+
+            # Send confirmation to user
+            user_message = (
+                f"Hello {name},\n\n"
+                "Thank you for contacting Listins. An Agent will contact you shortly.\n\n"
+                "Kind regards,\nListins Services Team"
+            )
+            mail.EmailMessage(
+                subject,
+                user_message,
+                settings.EMAIL_HOST_USER,
+                [email],
+                connection=connection
+            ).send()
+
+            # Send message to admin/support
+            admin_message = (
+                f"New landlord contact request:\n\n"
+                f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}"
+            )
+            mail.EmailMessage(
+                f"Support Request: {subject}",
+                admin_message,
+                settings.EMAIL_HOST_USER,
+                [settings.EMAIL_HOST_USER],  # Or your support email
+                connection=connection
+            ).send()
 
             connection.close()
+            contact_success = True
         else:
-            print(form.errors)  # Debugging: Print errors if the form is invalid
+            error_message = 'Please correct the errors below.'
     else:
         form = ContactSupportForm()
     
-    return render(request, 'landlord/LandlordContact.html', {'form': form})
+    return render(request, 'landlord/LandlordContact.html', {
+        'form': form,
+        'contact_success': contact_success,
+        'error_message': error_message
+    })
     
 
 
@@ -185,6 +191,76 @@ def landlord_home(request):
     )
     
     return render(request, "landlord/landlordIndex.html", {'accommodations': accommodations})
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class LandlordPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'landlord/landlord_password_change.html'
+    success_url = reverse_lazy('housing:landlord_profile')
+
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
+
+@login_required
+def property_verification_upload(request, property_id):
+    accommodation = get_object_or_404(Accommodation, pk=property_id, landlord=request.user)
+    if request.method == 'POST':
+        form = PropertyVerificationDocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            verification_doc = form.save(commit=False)
+            verification_doc.accommodation = accommodation
+            verification_doc.status = 'pending'
+            verification_doc.save()
+            accommodation.is_verified = False  # Explicitly mark as not verified
+            accommodation.save()
+            messages.success(request, 'Your document was uploaded successfully and is pending review.')
+            return render(request, 'landlord/property_verification_upload.html', {
+                'form': PropertyVerificationDocumentForm(),
+                'success': True,
+                'accommodation': accommodation
+            })
+    else:
+        form = PropertyVerificationDocumentForm()
+    return render(request, 'landlord/property_verification_upload.html', {
+        'form': form,
+        'success': False,
+        'accommodation': accommodation
+    })
+
+@login_required
+def landlord_profile(request):
+    creating_profile = False
+    try:
+        profile = LandlordProfile.objects.get(user=request.user)
+    except LandlordProfile.DoesNotExist:
+        profile = None
+        creating_profile = True
+    properties = Accommodation.objects.filter(landlord=request.user)
+
+    if request.method == 'POST':
+        if profile:
+            form = LandlordProfileForm(request.POST, request.FILES, instance=profile)
+        else:
+            form = LandlordProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_profile = form.save(commit=False)
+            new_profile.user = request.user
+            new_profile.save()
+            profile = new_profile
+            creating_profile = False
+    else:
+        if profile:
+            form = LandlordProfileForm(instance=profile)
+        else:
+            form = LandlordProfileForm()
+
+    context = {
+        'profile': profile,
+        'properties': properties,
+        'form': form,
+        'creating_profile': creating_profile,
+    }
+    return render(request, 'landlord/LandlordProfile.html', context)
 
 
 @login_required
