@@ -1,0 +1,50 @@
+{% comment %}
+Partial for rendering a unified form container in landlord templates.
+Expects:
+- form: Django Form instance
+- image_formset (optional): Django FormSet for images
+- submit_label: Label text for the submit button
+- form_id (optional): id attribute for the <form>
+{% endcomment %}
+<form method="post" enctype="multipart/form-data" class="space-y-6"{% if form_id %} id="{{ form_id }}"{% endif %}>
+  {% csrf_token %}
+  {# Non-field errors #}
+  {% if form.non_field_errors %}
+    <div class="mt-4 p-4 bg-red-50 text-red-600 rounded">
+      <ul class="list-disc list-inside">
+        {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% for field in form.visible_fields %}
+    <div>
+      <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ field.errors|join:", " }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if image_formset %}
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+    {{ image_formset.management_form }}
+    {% for sub in image_formset %}
+    <div>
+      <label class="block text-sm font-medium text-gray-700">{{ sub.image.label }}</label>
+      {{ sub.image }}
+      {% if sub.image.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ sub.image.errors|join:", " }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="flex justify-end mt-4">
+    <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg">{{ submit_label }}</button>
+  </div>
+</form>

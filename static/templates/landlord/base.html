@@ -29,14 +29,13 @@
 </head>
 
 <body class="bg-gray-50 font-sans">
-
-  
+  <!-- Standardized Navigation Bar -->
   <nav class="bg-white shadow-sm fixed w-full z-50">
       <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between h-16">
               <div class="flex">
                   <div class="flex-shrink-0 flex items-center">
-                      <img class="h-8 w-auto" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" alt="Logo"/>
+                      <img class="h-8 w-auto" src="{% static 'images/logo1.svg' %}" alt="Logo"/>
                   </div>
                   <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                       {% if user.user_type ==  'Landlord'%}
@@ -55,17 +54,13 @@
                          Properties
                       </a>
                       <a href="{% url 'housing:landlord_contact' %}"
-                         class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'about' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
-                         About
-                      </a>
-                      <a href="{% url 'housing:landlord_contact' %}"
-                         class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'contact' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
+                         class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
                          Contact
                       </a>
                   </div>
               </div>
               {% if user.is_authenticated %}
-                  <div class="flex items-center"><div class="relative"><button class="flex items-center !rounded-button bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200" onclick="document.getElementById(&#34;user-dropdown&#34;).classList.toggle(&#34;hidden&#34;)"><img src="{% static 'images/placeholder.jpg' %}" class="h-6 w-6 rounded-full mr-2" /><span>{{ user.first_name }} </span><i class="fas fa-chevron-down ml-2"></i></button><div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"><a href="{% url 'housing:landlord_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a><div class="border-t border-gray-100"></div><a href="{% url 'housing:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a></div></div></div>
+                  <div class="flex items-center"><div class="relative"><button class="flex items-center !rounded-button bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200" onclick="document.getElementById('user-dropdown').classList.toggle('hidden')"><img src="{% static 'images/placeholder.jpg' %}" class="h-6 w-6 rounded-full mr-2" /><span>{{ user.first_name }} </span><i class="fas fa-chevron-down ml-2"></i></button><div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"><a href="{% url 'housing:landlord_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a><div class="border-t border-gray-100"></div><a href="{% url 'housing:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a></div></div></div>
               {% else %}
                   <div class="flex items-center">
                       <a href="{% url 'housing:login' %}"><button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium mr-3"> Sign In</button></a>
@@ -75,6 +70,9 @@
           </div>
       </div>
   </nav>
+
+     
+  
     <!-- {% if messages %}
         <div class="max-w-2xl mx-auto mt-6">
         {% for message in messages %}

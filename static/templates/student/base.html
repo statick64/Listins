@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}Student Housing Platform{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
+    <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000" data-border-radius="small"></script>
+    <style>
+      body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+  <nav class="bg-white shadow-sm fixed w-full z-50">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex">
+          <div class="flex-shrink-0 flex items-center">
+            <a href="{% url 'housing:index' %}"><img class="h-8 w-auto" src="{% static 'images/logo1.svg' %}" alt="Logo"/></a>
+          </div>
+          <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <a href="{% url 'housing:index' %}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'index' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">Home</a>
+            <a href="{% url 'housing:studentProperties' %}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'studentProperties' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">Properties</a>
+          </div>
+        </div>
+        <div class="flex items-center">
+          {% if user.is_authenticated %}
+            <div class="relative">
+              <button class="flex items-center bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 rounded" onclick="document.getElementById('user-menu').classList.toggle('hidden')">
+                <img src="{% static 'images/placeholder.jpg' %}" class="h-6 w-6 rounded-full mr-2" alt="User"/><span>{{ user.first_name }}</span><i class="fas fa-chevron-down ml-2"></i>
+              </button>
+              <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                <div class="border-t border-gray-100"></div>
+                <a href="{% url 'housing:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a>
+              </div>
+            </div>
+          {% else %}
+            <a href="{% url 'housing:login' %}" class="text-sm font-medium text-gray-700 hover:text-gray-900 mr-4">Sign In</a>
+            <a href="{% url 'housing:register' %}" class="text-sm font-medium text-custom border border-custom px-4 py-2 rounded hover:bg-gray-100">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  {% block content %}{% endblock %}
+  
+  <footer class="bg-gray-900 mt-12">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <img class="h-8 w-auto" src="{% static 'images/logo1.svg' %}" alt="Logo"/>
+          <p class="mt-4 text-base text-gray-400">Connecting students with homes.</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">About</a></li>
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Careers</a></li>
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Support</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Help Center</a></li>
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Safety Center</a></li>
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Legal</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Follow Us</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Facebook</a></li>
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Twitter</a></li>
+            <li><a href="#" class="text-base text-gray-300 hover:text-white">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 border-t border-gray-700 pt-8">
+        <p class="text-base text-gray-400 text-center">© 2025 Student Housing Platform. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
