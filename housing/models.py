@@ -106,17 +106,21 @@ class Booking(models.Model):
         return f"Booking {self.booking_id} - {self.accommodation}"
 
 
-class Payment(models.Model):
-    payment_id = models.AutoField(primary_key=True)
-    booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
+class LandlordSubscription(models.Model):
+    subscription_id = models.AutoField(primary_key=True)
+    landlord = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': 'Landlord'})
+    plan = models.CharField(max_length=20, choices=[('basic', 'Basic'), ('standard', 'Standard'), ('premium', 'Premium')])
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=50)
+    payment_method = models.CharField(max_length=50, default='Paystack')
     payment_status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Completed', 'Completed'), ('Failed', 'Failed')])
     transaction_id = models.CharField(max_length=100, unique=True)
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Payment {self.payment_id} - {self.payment_status}"
+        return f"{self.landlord.username} - {self.plan.capitalize()} Plan ({self.payment_status})"
 
 
 class Review(models.Model):
@@ -136,17 +140,6 @@ class ReviewDetails(models.Model):
 
     def __str__(self):
         return f"Review {self.review.review_id} - {self.rating} Stars"
-
-
-class Notification(models.Model):
-    notification_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    message = models.TextField()
-    status = models.CharField(max_length=10, choices=[('sent', 'sent'), ('failed', 'failed')])
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Notification {self.notification_id} - {self.status}"
 
 
 class PropertyVerificationDocument(models.Model):

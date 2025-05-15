@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import paypalrestsdk
 from django.urls import reverse
 from django.core.paginator import Paginator  # add paginator import
+from django.utils import timezone  # Add timezone import for Paystack
 
 from django.core import mail
 from django.core.mail.message import EmailMessage
@@ -26,11 +27,7 @@ from django.urls import reverse_lazy
 
 
 
-paypalrestsdk.configure({
-    "mode": settings.PAYPAL_MODE,
-    "client_id": settings.PAYPAL_CLIENT_ID,
-    "client_secret": settings.PAYPAL_CLIENT_SECRET,
-})
+
 
 
 # Home Page
@@ -291,57 +288,132 @@ def landlord_home(request):
     )
     verified_count = accommodations.filter(is_verified=True).count()
     
-    return render(request, "landlord/landlordIndex.html", {'accommodations': accommodations, 'verified_count': verified_count})
+    # Get active subscription if any
+    from .models import LandlordSubscription
+    active_subscription = LandlordSubscription.objects.filter(
+        landlord=request.user,
+        is_active=True,
+        end_date__gt=timezone.now()  # End date is in the future
+    ).first()
+    
+    return render(request, "landlord/landlordIndex.html", {
+        'accommodations': accommodations, 
+        'verified_count': verified_count,
+        'active_subscription': active_subscription
+    })
 
 
 @login_required
 def subscription_page(request):
-    return render(request, 'landlord/suscriptionPage.html')
+    # Check if user is a landlord and has an active subscription
+    from .models import LandlordSubscription
+    
+    active_subscription = None
+    if request.user.user_type == 'Landlord':
+        active_subscription = LandlordSubscription.objects.filter(
+            landlord=request.user,
+            is_active=True,
+            end_date__gt=timezone.now()  # End date is in the future
+        ).first()
+    
+    if active_subscription:
+        # User has an active subscription, show the details
+        return render(request, 'landlord/active_subscription.html', {
+            'subscription': active_subscription
+        })
+    else:
+        # No active subscription, show the subscription options page
+        return render(request, 'landlord/suscriptionPage.html')
 
 @login_required
 def start_subscription(request, plan):
-    # Define amount based on plan
+    # Define amount based on plan - convert to Kobo (Paystack uses the smallest currency unit)
     prices = {
-        'basic': '19.99',
-        'standard': '39.99',
-        'premium': '59.99'
+        'basic': 100,  # 19.99 USD in cents (or equivalent in Kobo for Naira)
+        'standard': 250,  # 39.99 USD in cents
+        'premium': 500   # 59.99 USD in cents
     }
-    price = prices.get(plan, '19.99')  # Default to basic if not found
-
-    payment = paypalrestsdk.Payment({
-        "intent": "sale",
-        "payer": {
-            "payment_method": "paypal"},
-        "redirect_urls": {
-            "return_url": request.build_absolute_uri(reverse('housing:payment_success')),
-            "cancel_url": request.build_absolute_uri(reverse('housing:payment_cancel')),
-        },
-        "transactions": [{
-            "item_list": {
-                "items": [{
-                    "name": f"{plan.capitalize()} Plan Subscription",
-                    "sku": plan,
-                    "price": price,
-                    "currency": "USD",
-                    "quantity": 1}]},
-            "amount": {
-                "total": price,
-                "currency": "USD"},
-            "description": f"Subscription payment for {plan.capitalize()} Plan."}]})
-
-    if payment.create():
-        for link in payment.links:
-            if link.method == "REDIRECT":
-                redirect_url = link.href
-                return redirect(redirect_url)
-    else:
-        print(payment.error)
-        return redirect('payment_error')
+    price = prices.get(plan, 100)  # Default to basic if not found
+    
+    # Get the user's email 
+    email = request.user.username
+    # Create a unique reference for this transaction
+    reference = f"sub_{request.user.id}_{plan}_{int(timezone.now().timestamp())}"
+    
+    # Create payment metadata
+    metadata = {
+        "user_id": request.user.id,
+        "plan": plan,
+        "reference": reference
+    }
+    
+    # Store subscription info in session for verification later
+    request.session['payment_reference'] = reference
+    request.session['payment_plan'] = plan
+    request.session['payment_amount'] = price
+    
+    # Prepare context with payment info
+    context = {
+        'paystack_public_key': settings.PAYSTACK_PUBLIC_KEY,
+        'amount': price,
+        'email': email,
+        'reference': reference,
+        'plan_name': plan.capitalize(),
+        'callback_url': request.build_absolute_uri(reverse('housing:payment_success')),
+        'metadata': metadata
+    }
+    
+    return render(request, 'landlord/payment_page.html', context)
 
 
 @login_required
 def payment_success(request):
-    return render(request, 'landlord/paymentSuccess.html')
+    # Get the reference from the request
+    reference = request.GET.get('reference', '')
+    
+    if not reference:
+        messages.error(request, 'No payment reference found.')
+        return redirect('housing:subscription_page')
+    
+    # Verify payment with session data to prevent tampering
+    stored_reference = request.session.get('payment_reference')
+    
+    if reference != stored_reference:
+        messages.error(request, 'Invalid payment reference.')
+        return redirect('housing:subscription_page')
+    
+    # Get plan and amount from session
+    plan = request.session.get('payment_plan')
+    amount = request.session.get('payment_amount')
+    
+    # Record the successful subscription in the database
+    from .models import LandlordSubscription
+    
+    # Calculate the end date (30 days from now)
+    end_date = timezone.now() + timezone.timedelta(days=30)
+    
+    # Create the subscription record
+    subscription = LandlordSubscription(
+        landlord=request.user,
+        plan=plan,
+        amount=amount,
+        payment_status='Completed',
+        transaction_id=reference,
+        end_date=end_date,
+        is_active=True
+    )
+    subscription.save()
+    
+    # Clear session data
+    if 'payment_reference' in request.session:
+        del request.session['payment_reference']
+    if 'payment_plan' in request.session:
+        del request.session['payment_plan']
+    if 'payment_amount' in request.session:
+        del request.session['payment_amount']
+    
+    messages.success(request, f'Your {plan.capitalize()} plan subscription was successful!')
+    return render(request, 'landlord/paymentSuccess.html', {'plan': plan.capitalize()})
 
 @login_required
 def payment_cancel(request):

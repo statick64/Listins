@@ -1,0 +1,75 @@
+{% extends 'notifications/base.html' %}
+{% load static %}
+
+{% block title %}{{ plan_name }} Plan Subscription Payment{% endblock %}
+
+{% block content %}
+<div class="py-20">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="py-8 px-6">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ plan_name }} Plan</h2>
+                <p class="text-gray-600 mb-6">Complete your subscription payment</p>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-md mb-6">
+                <div class="flex justify-between py-2">
+                    <span class="text-gray-600">Plan:</span>
+                    <span class="font-medium">{{ plan_name }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-t border-gray-200">
+                    <span class="text-gray-600">Amount:</span>
+                    <span class="font-medium">P{{ amount|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-t border-gray-200">
+                    <span class="text-gray-600">Email:</span>
+                    <span class="font-medium">{{ email }}</span>
+                </div>
+            </div>
+            
+            <button type="button" onclick="payWithPaystack()" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all">
+                Pay Now
+            </button>
+            
+            <div class="mt-4 text-center">
+                <a href="{% url 'housing:landlord_properties' %}" class="text-sm text-gray-500 hover:text-gray-700">Cancel and return to properties</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+  function payWithPaystack() {
+    var handler = PaystackPop.setup({
+      key: '{{ paystack_public_key }}',
+      email: '{{ email }}',
+      amount: {{ amount }},
+      currency: 'NGN',
+      ref: '{{ reference }}',
+      metadata: {
+        custom_fields: [
+          {
+            display_name: "Plan",
+            variable_name: "plan",
+            value: "{{ plan_name }}"
+          },
+          {
+            display_name: "User ID",
+            variable_name: "user_id",
+            value: "{{ metadata.user_id }}"
+          }
+        ]
+      },
+      callback: function(response) {
+        // Redirect to success page with reference
+        window.location.href = "{% url 'housing:payment_success' %}?reference=" + response.reference;
+      },
+      onClose: function() {
+        alert('Transaction was not completed, window closed.');
+      }
+    });
+    handler.openIframe();
+  }
+</script>
+{% endblock %}

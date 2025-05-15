@@ -10,9 +10,27 @@
                     <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg">Efficiently manage your student housing properties and connect with potential tenants</p>
                 </div>
                 <div class="mt-10 max-w-4xl mx-auto"><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="bg-white shadow-lg !rounded-button p-6 text-center"><i class="fas fa-plus-circle text-4xl text-custom mb-4"></i><h3 class="text-xl font-semibold mb-2">List New Property</h3><p class="text-gray-500 mb-4">Add a new property listing to your portfolio</p><a href="{% url 'housing:add_property' %}" class="!rounded-button bg-[#4f46e5] text-white px-6 py-2 text-sm font-medium w-full">Add Property</a></div><div class="bg-white shadow-lg !rounded-button p-6"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-semibold">Active Listings</h3><span class="text-3xl font-bold text-custom">{{ accommodations|length }}</span></div><div class="space-y-2"><div class="flex justify-between text-sm"><span class="text-gray-500">Total Verified Accommodations</span><span class="font-medium">{{ verified_count }}</span></div><div class="flex justify-between text-sm"><span class="text-gray-500">Inquiries</span><span class="font-medium">56</span></div></div></div><div class="bg-white shadow-lg !rounded-button p-6">
-                    <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-semibold">Subscriptions</h3></div>
-                    <div class="space-y-2">
-                      <div class="flex justify-between text-sm"><span class="text-gray-500">Active Subscription</span><span class="font-medium">{{ active_subscription|default:"None" }}</span></div>
+                    <div class="flex justify-between items-center mb-4">
+                      <h3 class="text-xl font-semibold">Subscription</h3>
+                      {% if active_subscription %}
+                        <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">Active</span>
+                      {% endif %}
+                    </div>
+                    <div class="space-y-3">
+                      {% if active_subscription %}
+                        <div class="flex justify-between text-sm">
+                          <span class="text-gray-500">Current Plan</span>
+                          <span class="font-medium text-primary">{{ active_subscription.plan|capfirst }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                          <span class="text-gray-500">Expires On</span>
+                          <span class="font-medium">{{ active_subscription.end_date|date:"M d, Y" }}</span>
+                        </div>
+                        <a href="{% url 'housing:subscription_page' %}" class="mt-2 block text-center text-sm text-primary hover:underline">View Details</a>
+                      {% else %}
+                        <div class="text-sm text-gray-500">No active subscription</div>
+                        <a href="{% url 'housing:subscription_page' %}" class="mt-2 block w-full !rounded-button bg-primary hover:bg-secondary text-white px-4 py-2 text-sm text-center">Subscribe Now</a>
+                      {% endif %}
                     </div>
                   </div></div></div>
             </div> 

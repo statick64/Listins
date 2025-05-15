@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'housing.context_processors.unread_messages_count',
             ],
         },
     },
@@ -159,7 +160,8 @@ MJ_APIKEY_PUBLIC = config("MJ_APIKEY_PUBLIC")
 MJ_APIKEY_PRIVATE = config("MJ_APIKEY_PRIVATE")
 SENDER_EMAIL = config("SENDER_EMAIL")
 
-PAYPAL_CLIENT_ID = config("PAYPAL_CLIENT_ID")
-PAYPAL_CLIENT_SECRET = config("PAYPAL_CLIENT_SECRET")
-PAYPAL_MODE = config("PAYPAL_MODE")
+# Paystack settings
+PAYSTACK_SECRET_KEY = config("PAYSTACK_SECRET_KEY", default="")
+PAYSTACK_PUBLIC_KEY = config("PAYSTACK_PUBLIC_KEY", default="")
+
 
