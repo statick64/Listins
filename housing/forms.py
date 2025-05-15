@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 
-from .models import Accommodation, AccommodationImage, Booking, LandlordProfile, PropertyVerificationDocument
+from .models import Accommodation, AccommodationImage, Booking, Profile, PropertyVerificationDocument
 
 User = get_user_model()  # This ensures you're using the correct user model
 
@@ -115,9 +115,9 @@ class SignUpForm(UserCreationForm):
 
 
 
-class LandlordProfileForm(forms.ModelForm):
+class ProfileForm(forms.ModelForm):
     class Meta:
-        model = LandlordProfile
+        model = Profile
         fields = ['address', 'profile_image', 'document_type', 'verification_document']
         widgets = {
             'address': forms.TextInput(attrs={'class': 'w-full mt-1 p-2 bg-green-100 rounded'}),

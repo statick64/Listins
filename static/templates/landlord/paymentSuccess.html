@@ -1,0 +1,8 @@
+{% extends 'landlord/base.html' %}
+{% block content %}
+<div class="text-center py-20">
+  <h1 class="text-4xl font-bold text-green-600">Payment Successful!</h1>
+  <p class="mt-4 text-lg text-gray-700">Thank you for subscribing to our platform.</p>
+  <a href="{% url 'housing:landlord_home' %}" class="mt-6 inline-block bg-primary text-white py-2 px-6 rounded-lg hover:bg-secondary">Go to Dashboard</a>
+</div>
+{% endblock %}

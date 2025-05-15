@@ -1,0 +1,51 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+{% block content %}
+
+<main class="max-w-6xl mx-auto px-6 py-12 pt-20">
+  <div class="grid md:grid-cols-2 gap-12 bg-white rounded-lg shadow-lg p-6">
+    
+    <!-- Booking Form -->
+    <div>
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Book This Property</h2>
+      <p class="text-sm text-gray-600 mb-6">Fill out the form below to request a booking. We will contact you to confirm availability.</p>
+      
+      <form method="POST" action="{% url 'housing:book_property' property.accommodation_id %}">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Email Address</label>
+          <input name="email" type="email" required class="w-full border border-gray-300 rounded px-4 py-2" />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Preferred Move-in Date</label>
+          <input name="move_in_date" type="date" required class="w-full border border-gray-300 rounded px-4 py-2" />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Additional Notes</label>
+          <textarea name="message" rows="4" class="w-full border border-gray-300 rounded px-4 py-2"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-primary text-white font-medium py-2 rounded-button hover:bg-secondary">Submit Booking Request</button>
+      </form>
+    </div>
+
+    <!-- Property Preview -->
+    <div class="border rounded-lg p-4 bg-gray-100">
+      <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="w-full h-48 object-cover rounded mb-4">
+      <h3 class="text-xl font-semibold text-gray-900">{{ property.title }}</h3>
+      <p class="text-gray-600">{{ property.city }}, {{ property.state }}</p>
+      <div class="flex items-center space-x-4 mt-2 text-sm text-gray-700">
+        <span><i class="ri-hotel-bed-line mr-1"></i>{{ property.bedrooms }} Bed</span>
+        <span><i class="ri-shower-line mr-1"></i>{{ property.bathrooms }} Bath</span>
+        <span><i class="ri-ruler-line mr-1"></i>{{ property.square_footage }} sq ft</span>
+      </div>
+      <p class="text-lg text-primary font-bold mt-4">P{{ property.price }}/month</p>
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}
+

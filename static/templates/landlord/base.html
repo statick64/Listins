@@ -24,6 +24,17 @@
       transform: translateY(-5px);
       transition: transform 0.3s ease;
       }
+      /* Loader spinner */
+      .loader {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 
 </head>
@@ -35,7 +46,7 @@
           <div class="flex justify-between h-16">
               <div class="flex">
                   <div class="flex-shrink-0 flex items-center">
-                      <img class="h-8 w-auto" src="{% static 'images/logo1.svg' %}" alt="Logo"/>
+                      <img class="h-8 w-auto" src="{% static 'images/logo.svg' %}" alt="Logo"/>
                   </div>
                   <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                       {% if user.user_type ==  'Landlord'%}
@@ -53,18 +64,28 @@
                          class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {% if request.resolver_match.url_name == 'landlord_properties' %}border-custom text-custom{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %}">
                          Properties
                       </a>
-                      <a href="{% url 'housing:landlord_contact' %}"
+                      <a href="{% url 'housing:contact' %}"
                          class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
                          Contact
                       </a>
                   </div>
               </div>
               {% if user.is_authenticated %}
-                  <div class="flex items-center"><div class="relative"><button class="flex items-center !rounded-button bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200" onclick="document.getElementById('user-dropdown').classList.toggle('hidden')"><img src="{% static 'images/placeholder.jpg' %}" class="h-6 w-6 rounded-full mr-2" /><span>{{ user.first_name }} </span><i class="fas fa-chevron-down ml-2"></i></button><div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"><a href="{% url 'housing:landlord_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a><div class="border-t border-gray-100"></div><a href="{% url 'housing:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a></div></div></div>
+                  <div class="flex items-center">
+                    <!-- Messages Notification Icon -->
+                    <a href="{% url 'housing:messaging_hub' %}" class="relative mr-4 p-2 text-gray-500 hover:text-gray-700">
+                      <i class="ri-message-3-line text-xl"></i>
+                      {% if unread_messages_count > 0 %}
+                      <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">{{ unread_messages_count }}</span>
+                      {% endif %}
+                    </a>
+                    
+                    <div class="relative"><button class="flex items-center !rounded-button bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200" onclick="document.getElementById('user-dropdown').classList.toggle('hidden')"><img src="{% static 'images/placeholder.jpg' %}" class="h-6 w-6 rounded-full mr-2" /><span>{{ user.first_name }} </span><i class="fas fa-chevron-down ml-2"></i></button><div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"><a href="{% url 'housing:landlord_profile' %} " class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a><a href="{% url 'housing:subscription_page' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account</a><div class="border-t border-gray-100"></div><a href="{% url 'housing:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a></div></div>
+                  </div>
               {% else %}
                   <div class="flex items-center">
-                      <a href="{% url 'housing:login' %}"><button class="!rounded-button bg-custom text-white px-4 py-2 text-sm font-medium mr-3"> Sign In</button></a>
-                      <a href="{% url 'housing:register' %}"><button class="!rounded-button border border-custom text-custom px-4 py-2 text-sm font-medium">Register</button></a>
+                      <a href="{% url 'housing:login' %}"><button class="!rounded-button bg-[#4f46e5] text-white px-4 py-2 text-sm font-medium mr-3"> Sign In</button></a>
+                      <a href="{% url 'housing:register' %}"><button class="!rounded-button border border-[#4f46e5] text-[#4f46e5] px-4 py-2 text-sm font-medium">Register</button></a>
                   </div>
               {% endif %}
           </div>
@@ -90,7 +111,7 @@
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-                <img class="h-8 w-auto" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png" alt="Logo"/>
+                <img class="h-8 w-auto" src="{% static 'images/logo.svg' %}" alt="Logo"/>
                 <p class="mt-4 text-base text-gray-400">Making student housing search simple and secure.</p>
             </div>
             <div>
@@ -119,10 +140,26 @@
             </div>
         </div>
         <div class="mt-8 border-t border-gray-700 pt-8">
-            <p class="text-base text-gray-400 text-center">© 2024 Linstins Housing Platform. All rights reserved.</p>
+            <p class="text-base text-gray-400 text-center"> 2024 Dormatch Housing Platform. All rights reserved.</p>
         </div>
     </div>
   </footer>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function() {
+          var btn = form.querySelector('button[type="submit"], input[type="submit"]');
+          if (btn) {
+            btn.disabled = true;
+            var spinner = document.createElement('span');
+            spinner.className = 'loader ml-2';
+            if (btn.tagName.toLowerCase() === 'button') { btn.appendChild(spinner); }
+            else { btn.parentNode.insertBefore(spinner, btn.nextSibling); }
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

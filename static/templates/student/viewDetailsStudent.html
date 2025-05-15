@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>24th Floor Luxury furnished Apartment - Details</title>
+  <title>{{ property.title }} - Details</title>
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
   <script>
     tailwind.config = {
@@ -63,33 +63,36 @@
   <main class="max-w-5xl mx-auto px-6 py-10">
     <div class="grid md:grid-cols-2 gap-8">
       <!-- Image -->
-      <img src="{% static 'images/apartment1.jpg' %}" alt="Modern Studio Apartment" class="w-full h-80 object-cover rounded-lg shadow-sm" />
+      <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="w-full h-80 object-cover rounded-lg shadow-sm" />
 
       <!-- Details -->
       <div>
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">24th Floor Luxury furnished Apartment</h2>
-        <p class="text-gray-600 mb-4">Newman Real Estate, Gaborone</p>
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">{{ property.title }}</h2>
+        <p class="text-gray-600 mb-4">{{ property.address }}, {{ property.city }}</p>
 
         <div class="flex flex-wrap gap-4 mb-6">
-          <div class="flex items-center text-gray-700"><i class="ri-hotel-bed-line mr-1"></i>1 Bed</div>
-          <div class="flex items-center text-gray-700"><i class="ri-shower-line mr-1"></i>1 Bath</div>
-          <div class="flex items-center text-gray-700"><i class="ri-ruler-line mr-1"></i>400 sq ft</div>
-          <div class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Available</div>
+          <div class="flex items-center text-gray-700"><i class="ri-hotel-bed-line mr-1"></i>{{ property.bedrooms }} Bed</div>
+          <div class="flex items-center text-gray-700"><i class="ri-shower-line mr-1"></i>{{ property.bathrooms }} Bath</div>
+          <div class="flex items-center text-gray-700"><i class="ri-ruler-line mr-1"></i>{{ property.square_footage }} sq ft</div>
+          {% if property.status == 'Available' %}
+          <div class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">{{ property.status }}</div>
+          {% elif property.status == 'Coming Soon' %}
+          <div class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">{{ property.status }}</div>
+          {% else %}
+          <div class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">{{ property.status }}</div>
+          {% endif %}
         </div>
 
-        <p class="text-gray-700 mb-4">
-          This modern studio apartment offers a clean and minimalist design, perfect for students looking for comfort and simplicity.
-          With ample natural lighting, neutral tones, and fully furnished interiors, this space is ideal for focused study and relaxation.
-        </p>
+        <p class="text-gray-700 mb-4">{{ property.description }}</p>
 
-        <p class="text-gray-900 text-2xl font-bold mb-6">P800/month</p>
+        <p class="text-gray-900 text-2xl font-bold mb-6">P{{ property.price }}/month</p>
 
         <div class="flex gap-4 flex-wrap">
-          <button class="px-5 py-2 bg-primary text-white text-sm font-medium rounded-button hover:bg-secondary">Book Now</button>
+          <a href="{% url 'housing:book_property' property.pk %}" class="px-5 py-2 bg-primary text-white text-sm font-medium rounded-button hover:bg-secondary">Book Now</a>
           <button onclick="openGalleryModal()" class="px-5 py-2 bg-black text-white text-sm font-medium rounded-button hover:bg-gray-700">
             View Gallery
           </button>
-          <a href="properties.html" class="px-5 py-2 border border-gray-300 text-sm font-medium rounded-button hover:bg-gray-100">Back to Listings</a>
+          <a href="{% url 'housing:studentProperties' %}" class="px-5 py-2 border border-gray-300 text-sm font-medium rounded-button hover:bg-gray-100">Back to Listings</a>
         </div>
       </div>
     </div>
@@ -103,10 +106,9 @@
       </button>
       <h3 class="text-lg font-semibold mb-4">Gallery</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <img src="{% static 'images/apartment1.jpg' %}" alt="Image 1" class="w-full h-48 object-cover rounded">
-        <img src="{% static 'images/apartment2.jpg' %}" alt="Image 2" class="w-full h-48 object-cover rounded">
-        <img src="{% static 'images/apartment3.jpg' %}" alt="Image 3" class="w-full h-48 object-cover rounded">
-        <img src="{% static 'images/apartment4.jpg' %}" alt="Image 4" class="w-full h-48 object-cover rounded">
+        {% for img in images %}
+        <img src="{{ img.image.url }}" alt="Image {{ forloop.counter }}" class="w-full h-48 object-cover rounded">
+        {% endfor %}
       </div>
     </div>
   </div>
@@ -147,7 +149,7 @@
         </div>
       </div>
       <div class="border-t border-gray-800 mt-12 pt-6 text-center text-gray-500">
-        <p>© 2025 Listins Housing Platform. All rights reserved.</p>
+        <p> 2025 Dormatch Housing Platform. All rights reserved.</p>
       </div>
     </div>
   </footer>

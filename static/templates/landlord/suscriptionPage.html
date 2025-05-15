@@ -1,0 +1,56 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="pt-16 bg-gray-50 min-h-screen">
+  <section class="max-w-7xl mx-auto px-6 py-12">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Choose Your Subscription Plan</h1>
+      <p class="text-gray-600 text-lg">Unlock premium features and maximize your property listings.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Basic Plan -->
+      <div class="bg-white rounded-lg shadow-md p-8 flex flex-col items-center">
+        <h2 class="text-2xl font-bold text-primary mb-4">Basic</h2>
+        <p class="text-gray-700 text-3xl font-bold mb-4">P100 / Month</p>
+        <ul class="text-gray-600 space-y-2 mb-6 text-sm">
+          <li>✔ 5 Active Listings</li>
+          <li>✔ Basic Support</li>
+          <li>✔ Limited Property Exposure</li>
+        </ul>
+        <a href="{% url 'housing:start_subscription' 'basic' %}" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary text-sm font-medium">Subscribe Now</a>
+      </div>
+
+      <!-- Standard Plan -->
+      <div class="bg-white rounded-lg shadow-md p-8 flex flex-col items-center border-2 border-primary">
+        <h2 class="text-2xl font-bold text-primary mb-4">Standard</h2>
+        <p class="text-gray-700 text-3xl font-bold mb-4">P250 / Month</p>
+        <ul class="text-gray-600 space-y-2 mb-6 text-sm">
+          <li>✔ 20 Active Listings</li>
+          <li>✔ Priority Support</li>
+          <li>✔ Higher Property Exposure</li>
+          <li>✔ Access to Verified Tenants</li>
+        </ul>
+        <a href="{% url 'housing:start_subscription' 'standard' %}" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary text-sm font-medium">Subscribe Now</a>
+      </div>
+
+      <!-- Premium Plan -->
+      <div class="bg-white rounded-lg shadow-md p-8 flex flex-col items-center">
+        <h2 class="text-2xl font-bold text-primary mb-4">Premium</h2>
+        <p class="text-gray-700 text-3xl font-bold mb-4">P400 / Month</p>
+        <ul class="text-gray-600 space-y-2 mb-6 text-sm">
+          <li>✔ Unlimited Listings</li>
+          <li>✔ 24/7 VIP Support</li>
+          <li>✔ Featured Property Promotion</li>
+          <li>✔ Verified Badge on Profile</li>
+          <li>✔ Free Property Consultation</li>
+        </ul>
+        <a href="{% url 'housing:start_subscription' 'premium' %}" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary text-sm font-medium">Subscribe Now</a>
+      </div>
+
+    </div>
+  </section>
+</main>
+{% endblock %}

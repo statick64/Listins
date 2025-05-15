@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 from cloudinary.models import CloudinaryField
 
@@ -33,8 +34,8 @@ class CustomUser(AbstractUser):
 
 
 
-class LandlordProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='landlord_profile')
+class Profile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
     address = models.CharField(max_length=255, blank=True)
     profile_image = CloudinaryField('image', blank=True, null=True)  # Or use models.ImageField(upload_to='profile_images/')
     
@@ -162,3 +163,18 @@ class PropertyVerificationDocument(models.Model):
 
     def __str__(self):
         return f"Verification Doc for {self.accommodation.title} - {self.status}"
+
+
+class Message(models.Model):
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_messages')
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    accommodation = models.ForeignKey(Accommodation, on_delete=models.SET_NULL, null=True, blank=True, related_name='messages')
+    timestamp = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"Message from {self.sender.username} to {self.recipient.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"

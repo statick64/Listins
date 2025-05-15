@@ -1,0 +1,331 @@
+{% extends 'notifications/base.html' %}
+{% load static %}
+{% block content %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">Messages</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden flex h-[calc(100vh-220px)] min-h-[600px]">
+            <!-- Left Panel - Conversations -->
+            <div class="w-1/3 border-r border-gray-200 flex flex-col">
+                <div class="p-4 border-b border-gray-200">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div class="w-5 h-5 flex items-center justify-center text-gray-400">
+                                <i class="ri-search-line"></i>
+                            </div>
+                        </div>
+                        <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" placeholder="Search conversations...">
+                    </div>
+                </div>
+                
+                <div class="overflow-y-auto scrollbar-hide flex-1">
+                    {% if conversations %}
+                        {% for convo in conversations %}
+                        <div class="conversation{% if selected_contact == convo.contact %} active{% endif %} p-4 cursor-pointer" data-contact-id="{{ convo.contact.id }}">
+                            <div class="flex items-start">
+                                <div class="relative flex-shrink-0">
+                                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                        {% if convo.contact.profile.profile_image %}
+                                            <img src="{{ convo.contact.profile.profile_image.url }}" alt="{{ convo.contact.first_name }}" class="h-full w-full object-cover">
+                                        {% else %}
+                                            <i class="ri-user-line ri-lg"></i>
+                                        {% endif %}
+                                    </div>
+                                    <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full {% if convo.unread_count > 0 %}online-indicator{% else %}offline-indicator{% endif %} ring-2 ring-white"></span>
+                                </div>
+                                <div class="ml-3 flex-1 min-w-0">
+                                    <div class="flex justify-between items-baseline">
+                                        <h3 class="text-sm font-medium text-gray-900 truncate">{{ convo.contact.first_name }} {{ convo.contact.last_name }}</h3>
+                                        <span class="text-xs text-gray-500">{{ convo.latest_message.timestamp|date:"g:i A" }}</span>
+                                    </div>
+                                    {% if convo.accommodation %}
+                                    <div class="flex items-center">
+                                        <span class="text-xs font-medium text-primary truncate">{{ convo.accommodation.title }}</span>
+                                    </div>
+                                    {% endif %}
+                                    <p class="text-sm {% if convo.unread_count > 0 %}font-semibold text-gray-700{% else %}text-gray-500{% endif %} truncate mt-1">{{ convo.latest_message.content }}</p>
+                                    {% if convo.unread_count > 0 %}
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-primary text-white">{{ convo.unread_count }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-4 text-center text-gray-500">
+                            <p>No conversations yet.</p>
+                            <p class="text-sm mt-2">Messages from students or landlords will appear here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Panel - Chat -->
+            <div class="w-2/3 flex flex-col">
+                {% if selected_contact %}
+                <!-- Chat Header -->
+                <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <div class="relative flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                {% if selected_contact.profile.profile_image %}
+                                    <img src="{{ selected_contact.profile.profile_image.url }}" alt="{{ selected_contact.first_name }}" class="h-full w-full object-cover">
+                                {% else %}
+                                    <i class="ri-user-line ri-lg"></i>
+                                {% endif %}
+                            </div>
+                            <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full {% if selected_contact in online_users %}online-indicator{% else %}offline-indicator{% endif %} ring-2 ring-white"></span>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-gray-900">{{ selected_contact.first_name }} {{ selected_contact.last_name }}</h3>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500">{% if selected_contact in online_users %}Online{% else %}Offline{% endif %}</span>
+                                {% if related_accommodation %}
+                                <span class="mx-1.5 text-gray-500">•</span>
+                                <span class="text-xs font-medium text-primary">{{ related_accommodation.title }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+                            <div class="w-5 h-5 flex items-center justify-center">
+                                <i class="ri-information-line"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <!-- No conversation selected -->
+                <div class="p-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Your Messages</h3>
+                    <p class="text-sm text-gray-500">Select a conversation to view messages</p>
+                </div>
+                {% endif %}
+                
+                <!-- Chat Messages -->
+                <div class="flex-1 p-4 overflow-y-auto scrollbar-hide" id="message-container">
+                    {% if selected_contact %}
+                    <div class="space-y-4">
+                        {% if messages %}
+                            {% regroup messages by timestamp.date as message_days %}
+                            
+                            {% for day, day_messages in message_days %}
+                            <!-- Date Separator -->
+                            <div class="flex justify-center">
+                                <span class="px-4 py-1 rounded-full bg-gray-100 text-xs text-gray-500">
+                                    {% if day == today %}
+                                        Today
+                                    {% elif day == yesterday %}
+                                        Yesterday
+                                    {% else %}
+                                        {{ day|date:"F j, Y" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            {% for message in day_messages %}
+                                {% if message.sender == request.user %}
+                                <!-- Sent Message -->
+                                <div class="flex items-end justify-end">
+                                    <div class="flex flex-col space-y-2 items-end max-w-[70%]">
+                                        <div class="message-bubble-sent p-3">
+                                            <p class="text-sm">{{ message.content }}</p>
+                                        </div>
+                                        <span class="text-xs text-gray-500">{{ message.timestamp|date:"g:i A" }}</span>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <!-- Received Message -->
+                                <div class="flex items-end">
+                                    <div class="flex-shrink-0 mr-3">
+                                        <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                            {% if message.sender.profile.profile_image %}
+                                                <img src="{{ message.sender.profile.profile_image.url }}" alt="{{ message.sender.first_name }}" class="h-full w-full object-cover">
+                                            {% else %}
+                                                <i class="ri-user-line"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col space-y-2 max-w-[70%]">
+                                        <div class="message-bubble-received p-3">
+                                            <p class="text-sm">{{ message.content }}</p>
+                                        </div>
+                                        <span class="text-xs text-gray-500">{{ message.timestamp|date:"g:i A" }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="flex justify-center items-center h-full">
+                                <div class="text-center text-gray-500">
+                                    <p>No messages yet</p>
+                                    <p class="text-sm mt-2">Send a message to start the conversation</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="flex justify-center items-center h-full">
+                        <div class="text-center">
+                            <div class="text-gray-400 mb-4">
+                                <i class="ri-message-3-line text-6xl"></i>
+                            </div>
+                            <h3 class="text-xl font-medium text-gray-700 mb-2">Your Messages</h3>
+                            <p class="text-gray-500 max-w-md">Select a conversation from the list to view your messages or start a new conversation by visiting a property listing.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if related_accommodation and selected_contact %}
+                <!-- Property Info Card -->
+                <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
+                            {% if related_accommodation.main_image %}
+                                <img src="{{ related_accommodation.main_image.url }}" alt="{{ related_accommodation.title }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <i class="ri-building-line ri-lg"></i>
+                            {% endif %}
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-gray-900">{{ related_accommodation.title }}</h3>
+                            <p class="text-xs text-gray-500">{{ related_accommodation.address }}, {{ related_accommodation.city }} • P{{ related_accommodation.price }}/mo</p>
+                        </div>
+                        <a href="{% url 'housing:view_property' related_accommodation.accommodation_id %}" class="ml-auto bg-[#4f46e5] text-white px-3 py-1.5 rounded-button text-xs font-medium whitespace-nowrap">View Details</a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Chat Input -->
+                {% if selected_contact %}
+                <form id="message-form" class="p-4 border-t border-gray-200" method="post" action="{% url 'housing:send_message' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="recipient_id" value="{{ selected_contact.id }}">
+                    {% if related_accommodation %}
+                    <input type="hidden" name="accommodation_id" value="{{ related_accommodation.accommodation_id }}">
+                    {% endif %}
+                    
+                    <div class="flex items-center">
+                        <div class="relative flex-1 mx-2">
+                            <input type="text" name="content" id="message-input" class="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-[#4f46e5] focus:border-[#4f46e5] text-sm" placeholder="Type a message..." required>
+                        </div>
+                        <button type="submit" class="p-2 rounded-full bg-[#4f46e5] text-white hover:bg-[#4338ca]">
+                            <div class="w-5 h-5 flex items-center justify-center">
+                                <i class="ri-send-plane-fill"></i>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-2 flex justify-between items-center text-xs text-gray-500">
+                        <div class="flex space-x-4">
+                            {% if related_accommodation %}
+                            <a href="{% url 'housing:view_property' related_accommodation.accommodation_id %}" class="flex items-center hover:text-[#4f46e5]">
+                                <div class="w-4 h-4 flex items-center justify-center mr-1">
+                                    <i class="ri-building-line"></i>
+                                </div>
+                                <span>View Property</span>
+                            </a>
+                            {% endif %}
+                            <button type="button" class="flex items-center hover:text-[#4f46e5]">
+                                <div class="w-4 h-4 flex items-center justify-center mr-1">
+                                    <i class="ri-calendar-line"></i>
+                                </div>
+                                <span>Schedule Viewing</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const conversations = document.querySelectorAll('.conversation');
+            const messageContainer = document.getElementById('message-container');
+            const messageForm = document.getElementById('message-form');
+            
+            // Handle conversation selection
+            conversations.forEach(conversation => {
+                conversation.addEventListener('click', function() {
+                    // Remove active class from all conversations
+                    conversations.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked conversation
+                    this.classList.add('active');
+                    
+                    // Get the contact ID from the data attribute
+                    const contactId = this.getAttribute('data-contact-id');
+                    
+                    // Redirect to update the selected contact
+                    window.location.href = `?contact_id=${contactId}`;
+                });
+            });
+            
+            // Scroll to bottom of message container
+            if (messageContainer) {
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+            
+            // Handle form submission with AJAX
+            if (messageForm) {
+                messageForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(messageForm);
+                    const messageInput = document.getElementById('message-input');
+                    
+                    // Don't submit empty messages
+                    if (!messageInput.value.trim()) {
+                        return;
+                    }
+                    
+                    fetch('{% url "housing:send_message" %}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Add the new message to the conversation
+                            const messageSpace = document.querySelector('.space-y-4');
+                            
+                            // Create new message element
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = 'flex items-end justify-end';
+                            messageDiv.innerHTML = `
+                                <div class="flex flex-col space-y-2 items-end max-w-[70%]">
+                                    <div class="message-bubble-sent p-3">
+                                        <p class="text-sm">${messageInput.value}</p>
+                                    </div>
+                                    <span class="text-xs text-gray-500">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
+                            `;
+                            
+                            messageSpace.appendChild(messageDiv);
+                            
+                            // Clear input and scroll to bottom
+                            messageInput.value = '';
+                            messageContainer.scrollTop = messageContainer.scrollHeight;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                    });
+                });
+            }
+        });
+    </script>
+{% endblock %}

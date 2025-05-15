@@ -6,27 +6,41 @@ from django.forms import modelformset_factory
 from django.contrib import messages
 from django.conf import settings
 from mailjet_rest import Client
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+import paypalrestsdk
+from django.urls import reverse
+from django.core.paginator import Paginator  # add paginator import
 
 from django.core import mail
 from django.core.mail.message import EmailMessage
 
-from .forms import CustomAuthenticationForm, SignUpForm, AccommodationForm, AccommodationImageForm, AccommodationImageFormSet, ContactSupportForm, LandlordProfileForm
+from .forms import CustomAuthenticationForm, SignUpForm, AccommodationForm, AccommodationImageForm, AccommodationImageFormSet, ContactSupportForm, ProfileForm
 
 from django.db.models import Prefetch
-from .models import CustomUser, Accommodation, AccommodationImage, LandlordProfile, PropertyVerificationDocument
+from .models import CustomUser, Accommodation, AccommodationImage, Profile, PropertyVerificationDocument, Booking
 from .forms import PropertyVerificationDocumentForm
 from django.core.exceptions import PermissionDenied
 import cloudinary.uploader
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 
+
+
+paypalrestsdk.configure({
+    "mode": settings.PAYPAL_MODE,
+    "client_id": settings.PAYPAL_CLIENT_ID,
+    "client_secret": settings.PAYPAL_CLIENT_SECRET,
+})
+
+
 # Home Page
 def home(request):
-    return render(request, "student/index.html")
+    # Popular properties for index page: show latest 4 verified and not booked
+    accommodations = Accommodation.objects.filter(is_verified=True).exclude(status='Booked').order_by('-created_at')[:4]
+    return render(request, 'student/index.html', {'accommodations': accommodations})
 
 @csrf_protect
-def landlord_contact(request):
+def contact(request):
     contact_success = False
     error_message = ''
     if request.method == 'POST':
@@ -87,7 +101,31 @@ def studentDetails(request):
 
 
 def studentProperties(request):
-    return render(request, "student/properties.html")
+    # Fetch only available or coming soon accommodations (exclude booked)
+    accommodations = Accommodation.objects.exclude(status='Booked')
+    sort = request.GET.get('sort')
+    if sort == 'price_low':
+        accommodations = accommodations.order_by('price')
+    elif sort == 'price_high':
+        accommodations = accommodations.order_by('-price')
+    elif sort == 'newest':
+        accommodations = accommodations.order_by('-created_at')
+    else:
+        # Default: verified (available) first
+        accommodations = accommodations.order_by('-is_verified')
+    # Pagination: 9 per page
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(accommodations, 9)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'accommodations': page_obj.object_list,
+        'page_obj': page_obj,
+        'total_count': paginator.count,
+        'paginator': paginator,
+        'sort': sort,
+    }
+    return render(request, "student/properties.html", context)
+
 
 # def editProperty(request):
 #     return render(request, "editProperty.html")
@@ -114,12 +152,74 @@ def delete_main_image(request, property_id):
 
 @login_required
 def view_property(request, property_id):
-    property = get_object_or_404(Accommodation, pk=property_id, landlord=request.user)
-    existing_images = property.images.all()
-    return render(request, 'landlord/viewdetailLandlord.html', {
-        'property': property,
-        'existing_images': existing_images
-    })
+    # Fetch the accommodation for both student and landlord
+    property_obj = get_object_or_404(Accommodation, pk=property_id)
+    images = property_obj.images.all()
+    # Landlord sees landlord detail view
+    if hasattr(request.user, 'user_type') and request.user.user_type == 'Landlord':
+        if request.user != property_obj.landlord:
+            raise PermissionDenied
+        template = 'landlord/viewdetailLandlord.html'
+        context = {'property': property_obj, 'existing_images': images}
+    else:
+        # Student view
+        template = 'student/viewDetailsStudent.html'
+        context = {'property': property_obj, 'images': images}
+    return render(request, template, context)
+
+@login_required
+def book_property(request, property_id):
+    # Handle booking requests
+    property_obj = get_object_or_404(Accommodation, pk=property_id)
+    # Only allow if verified and not booked
+    if not property_obj.is_verified or property_obj.status == 'Booked':
+        raise PermissionDenied
+        
+    if request.method == 'POST':
+        # Create booking record
+        booking = Booking.objects.create(
+            student=request.user, 
+            accommodation=property_obj, 
+            status='Pending'
+        )
+        
+        # Collect form data
+        email = request.POST.get('email')
+        message_text = request.POST.get('message', '')
+        
+        # Import the Message model
+        from .models import Message
+        
+        # Format the booking message
+        booking_message = f"Booking Request for {property_obj.title}\n\n"
+        if message_text:
+            booking_message += f"{message_text}\n\n"
+        booking_message += f"Contact email: {email}\n"
+        booking_message += f"Property: {property_obj.title} ({property_obj.property_type})\n"
+        booking_message += f"Location: {property_obj.address}, {property_obj.city}\n"
+        booking_message += f"Price: P{property_obj.price}/month\n\n"
+        booking_message += "Please respond to this message to discuss the booking further."
+        
+        # Create a message from student to landlord
+        Message.objects.create(
+            sender=request.user,
+            recipient=property_obj.landlord,
+            content=booking_message,
+            accommodation=property_obj,
+            is_read=False
+        )
+        
+        # Notify the user
+        messages.success(request, "Your booking request has been sent to the landlord. You will receive a response in your messages.")
+        
+        # Redirect to the messaging hub
+        return redirect('housing:messaging_hub')
+    
+    # If GET request, render booking form
+    context = {
+        'property': property_obj
+    }
+    return render(request, 'student/bookNow.html', context)
 
 @csrf_protect
 @login_required
@@ -189,17 +289,75 @@ def landlord_home(request):
             to_attr='first_image'
         )
     )
+    verified_count = accommodations.filter(is_verified=True).count()
     
-    return render(request, "landlord/landlordIndex.html", {'accommodations': accommodations})
+    return render(request, "landlord/landlordIndex.html", {'accommodations': accommodations, 'verified_count': verified_count})
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+
+@login_required
+def subscription_page(request):
+    return render(request, 'landlord/suscriptionPage.html')
+
+@login_required
+def start_subscription(request, plan):
+    # Define amount based on plan
+    prices = {
+        'basic': '19.99',
+        'standard': '39.99',
+        'premium': '59.99'
+    }
+    price = prices.get(plan, '19.99')  # Default to basic if not found
+
+    payment = paypalrestsdk.Payment({
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"},
+        "redirect_urls": {
+            "return_url": request.build_absolute_uri(reverse('housing:payment_success')),
+            "cancel_url": request.build_absolute_uri(reverse('housing:payment_cancel')),
+        },
+        "transactions": [{
+            "item_list": {
+                "items": [{
+                    "name": f"{plan.capitalize()} Plan Subscription",
+                    "sku": plan,
+                    "price": price,
+                    "currency": "USD",
+                    "quantity": 1}]},
+            "amount": {
+                "total": price,
+                "currency": "USD"},
+            "description": f"Subscription payment for {plan.capitalize()} Plan."}]})
+
+    if payment.create():
+        for link in payment.links:
+            if link.method == "REDIRECT":
+                redirect_url = link.href
+                return redirect(redirect_url)
+    else:
+        print(payment.error)
+        return redirect('payment_error')
+
+
+@login_required
+def payment_success(request):
+    return render(request, 'landlord/paymentSuccess.html')
+
+@login_required
+def payment_cancel(request):
+    return render(request, 'landlord/paymentCancel.html')
+
+@login_required
+def payment_error(request):
+    return render(request, 'landlord/paymentError.html')
+
+
 
 class LandlordPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'landlord/landlord_password_change.html'
     success_url = reverse_lazy('housing:landlord_profile')
 
-from django.contrib import messages
-from django.shortcuts import get_object_or_404
+
 
 @login_required
 def property_verification_upload(request, property_id):
@@ -228,20 +386,20 @@ def property_verification_upload(request, property_id):
     })
 
 @login_required
-def landlord_profile(request):
+def profile(request):
     creating_profile = False
     try:
-        profile = LandlordProfile.objects.get(user=request.user)
-    except LandlordProfile.DoesNotExist:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
         profile = None
         creating_profile = True
     properties = Accommodation.objects.filter(landlord=request.user)
 
     if request.method == 'POST':
         if profile:
-            form = LandlordProfileForm(request.POST, request.FILES, instance=profile)
+            form = ProfileForm(request.POST, request.FILES, instance=profile)
         else:
-            form = LandlordProfileForm(request.POST, request.FILES)
+            form = ProfileForm(request.POST, request.FILES)
         if form.is_valid():
             new_profile = form.save(commit=False)
             new_profile.user = request.user
@@ -250,9 +408,9 @@ def landlord_profile(request):
             creating_profile = False
     else:
         if profile:
-            form = LandlordProfileForm(instance=profile)
+            form = ProfileForm(instance=profile)
         else:
-            form = LandlordProfileForm()
+            form = ProfileForm()
 
     context = {
         'profile': profile,
@@ -277,7 +435,7 @@ def landlord_properties(request):
 @csrf_protect
 def add_property(request):
     if request.method == 'POST':
-        form = AccommodationForm(request.POST)
+        form = AccommodationForm(request.POST, request.FILES)
         image_formset = AccommodationImageFormSet(request.POST, request.FILES, queryset=AccommodationImage.objects.none())
         print(form.errors)
         print(image_formset.errors)
@@ -311,30 +469,22 @@ def add_property(request):
 
 
 @csrf_protect
-def user_login(request):  # Renamed to avoid conflict
+def user_login(request):
     if request.method == 'POST':
-        form = CustomAuthenticationForm(None, data=request.POST)
-        email = request.POST.get('username')
-        password = request.POST.get('password')
-        print(email, password)
-        print(form.errors)
-
-
-        # Authenticate with email (assuming CustomUser uses email as username)
-        user = authenticate(request, username=email, password=password)
-        print(user)
-        if user is not None:
-            auth_login(request, user)  # Use Django’s built-in login function
-            print("Login successful")
-            if user.user_type == 'Landlord':
-                return redirect('housing:landlord_home')  # Replace with actual name
-            elif user.user_type == 'Student':
-                return redirect('housing:index')  # Replace with actual name 
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            # Redirect based on user type
+            redirect_map = {
+                'Landlord': 'housing:landlord_home',
+                'Student': 'housing:index',
+            }
+            return redirect(redirect_map.get(user.user_type, settings.LOGIN_REDIRECT_URL))
         else:
-            print("Invalid credentials")
+            messages.error(request, "Invalid username or password.")
     else:
         form = CustomAuthenticationForm()
-    
     return render(request, 'login-signup/login.html', {'form': form})
 
 def logout_view(request):

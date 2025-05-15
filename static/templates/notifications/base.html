@@ -13,28 +13,66 @@
     <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
     <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000" data-border-radius="small"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#6366F1',secondary:'#4F46E5'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
     <style>
-      body { font-family: 'Inter', sans-serif; }
 
       :where([class^="ri-"])::before { content: "\f3c2"; }
-      body {
-      font-family: 'Inter', sans-serif;
-      }
-      .property-card:hover {
-      transform: translateY(-5px);
-      transition: transform 0.3s ease;
-      }
-      /* Loader spinner */
-      .loader {
-        display: inline-block;
-        width: 1rem;
-        height: 1rem;
-        border: 2px solid currentColor;
-        border-top-color: transparent;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin { to { transform: rotate(360deg); } }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .message-bubble-sent {
+            background-color: #6366F1;
+            color: white;
+            border-radius: 16px 16px 0 16px;
+        }
+        .message-bubble-received {
+            background-color: #F5F5F5;
+            color: #1F2937;
+            border-radius: 16px 16px 16px 0;
+        }
+        .conversation:hover {
+            background-color: #F9FAFB;
+        }
+        .conversation.active {
+            background-color: #EEF2FF;
+            border-left: 3px solid #6366F1;
+        }
+        .online-indicator {
+            background-color: #10B981;
+        }
+        .offline-indicator {
+            background-color: #9CA3AF;
+        }
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background-color: #9CA3AF;
+            border-radius: 50%;
+            display: inline-block;
+            animation: typing 1.4s infinite both;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -128,24 +166,6 @@
       </div>
     </div>
   </footer>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('form').forEach(function(form) {
-        form.addEventListener('submit', function() {
-          var btn = form.querySelector('button[type="submit"], input[type="submit"]');
-          if (btn) {
-            btn.disabled = true;
-            var spinner = document.createElement('span');
-            spinner.className = 'loader ml-2';
-            if (btn.tagName.toLowerCase() === 'button') {
-              btn.appendChild(spinner);
-            } else {
-              btn.parentNode.insertBefore(spinner, btn.nextSibling);
-            }
-          }
-        });
-      });
-    });
-  </script>
+
 </body>
 </html>
